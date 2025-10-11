@@ -1,5 +1,6 @@
 import 'zone.js';
 import { bootstrapApplication } from '@angular/platform-browser';
+import { provideHttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 
 @Component({
@@ -14,4 +15,4 @@ import { Component } from '@angular/core';
 })
 class AppComponent {}
 
-bootstrapApplication(AppComponent).catch(err => console.error(err));
+bootstrapApplication(AppComponent, { providers: [provideHttpClient()] }).catch(err => console.error(err));
