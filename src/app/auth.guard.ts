@@ -8,7 +8,7 @@ export const authGuard: CanActivateFn = () => {
   const router = inject(Router);
   return api.verify().pipe(
     map((res: any) => {
-      const valid = !!res?.success;
+      const valid = !!res?.data?.valid;
       if (!valid) router.navigateByUrl('/');
       return valid;
     }),
@@ -18,4 +18,3 @@ export const authGuard: CanActivateFn = () => {
     })
   );
 };
-
