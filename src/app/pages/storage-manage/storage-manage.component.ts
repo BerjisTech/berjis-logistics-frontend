@@ -55,7 +55,7 @@ export class StorageManagePageComponent {
     const areaRaw = (f.elements.namedItem('areaSqm') as HTMLInputElement).value;
     const state = (f.elements.namedItem('state') as HTMLSelectElement).value || 'available';
     const area = areaRaw ? parseFloat(areaRaw) : undefined;
-    fetch(`/v1/warehouses/${this.selected.id}/units`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, areaSqm: area, state }) })
+    fetch(`/svc/v1/warehouses/${this.selected.id}/units`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, areaSqm: area, state }) })
       .then(() => this.refreshUnits());
   }
 
@@ -63,11 +63,10 @@ export class StorageManagePageComponent {
     ev.preventDefault(); if (!this.selected) return; const f = ev.target as HTMLFormElement;
     const uid = (f.elements.namedItem('userId') as HTMLInputElement).value.trim();
     const role = (f.elements.namedItem('role') as HTMLSelectElement).value || 'staff';
-    fetch(`/v1/warehouses/${this.selected.id}/staff`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: uid, role }) })
+    fetch(`/svc/v1/warehouses/${this.selected.id}/staff`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: uid, role }) })
       .then(() => this.refreshStaff());
   }
 
-  refreshUnits() { if (!this.selected) return; fetch(`/v1/warehouses/${this.selected.id}/units`).then(r => r.json()).then(r => this.units = r?.data || []); }
-  refreshStaff() { if (!this.selected) return; fetch(`/v1/warehouses/${this.selected.id}/staff`).then(r => r.json()).then(r => this.staff = r?.data || []); }
+  refreshUnits() { if (!this.selected) return; fetch(`/svc/v1/warehouses/${this.selected.id}/units`).then(r => r.json()).then(r => this.units = r?.data || []); }
+  refreshStaff() { if (!this.selected) return; fetch(`/svc/v1/warehouses/${this.selected.id}/staff`).then(r => r.json()).then(r => this.staff = r?.data || []); }
 }
-
