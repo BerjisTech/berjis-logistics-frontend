@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-home',
+  selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
@@ -32,4 +32,3 @@ import { RouterModule } from '@angular/router';
   `
 })
 export class HomeComponent {}
-
