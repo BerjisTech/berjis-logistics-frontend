@@ -2,16 +2,16 @@ import 'zone.js';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter, Routes } from '@angular/router';
-import { HomeComponent } from './app/home.component';
-import { StorageListComponent } from './app/storage-list.component';
-import { StorageManageComponent } from './app/storage-manage.component';
+import { HomePageComponent } from './app/pages/home/home.component';
+import { StorageListPageComponent } from './app/pages/storage/storage-list.component';
+import { StorageManagePageComponent } from './app/pages/storage-manage/storage-manage.component';
 import { authGuard } from './app/auth.guard';
 import { AppComponent } from './app/app.component';
 
 const routes: Routes = [
-  { path: '', component: HomeComponent },
-  { path: 'storage', component: StorageListComponent },
-  { path: 'storage/manage', component: StorageManageComponent, canActivate: [authGuard] },
+  { path: '', component: HomePageComponent },
+  { path: 'storage', component: StorageListPageComponent },
+  { path: 'storage/manage', component: StorageManagePageComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];
 
