@@ -6,6 +6,7 @@ import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { WarehousesService, Warehouse } from "./app/warehouses.service";
 import { InventoryService, InventoryItem } from "./app/inventory.service";
+import { ApiService } from "./app/api.service";
 
 @Component({
   selector: "app-root",
@@ -15,9 +16,17 @@ import { InventoryService, InventoryItem } from "./app/inventory.service";
   <div style="font-family: Inter, Arial, sans-serif; padding: 32px; max-width: 960px">
     <h1>Berjis Logistics</h1>
     <h2>Warehouses</h2>
-    <form (submit)="onCreateWarehouse($event)">
+    <form *ngIf="authed" (submit)="onCreateWarehouse($event)">
       <input placeholder="Name" name="name" required />
       <input placeholder="Location" name="location" />
+      <input type="number" step="any" placeholder="Lat" name="lat" />
+      <input type="number" step="any" placeholder="Lng" name="lng" />
+      <select name="state">
+        <option value="available">available</option>
+        <option value="occupied">occupied</option>
+        <option value="maintenance">maintenance</option>
+      </select>
+      <label><input type="checkbox" name="isMultiUnit" /> Multi-unit</label>
       <button type="submit">Create</button>
     </form>
     <div *ngIf="error" style="color:#b00; margin:8px 0">{{error}}</div>
@@ -61,12 +70,25 @@ import { InventoryService, InventoryItem } from "./app/inventory.service";
 class AppComponent {
   private whApi = inject(WarehousesService);
   private invApi = inject(InventoryService);
+  private core = inject(ApiService);
   warehouses: Warehouse[] = [];
   error = "";
   selected: Warehouse | null = null;
   inventory: InventoryItem[] = [];
   editId: string | null = null;
-  constructor() { this.refreshWarehouses(); }
+  authed = false;
+  userId: string | undefined;
+  constructor() {
+    this.core.verify().subscribe({
+      next: (res: any) => {
+        this.core.me = res?.data || null;
+        this.authed = !!this.core.me;
+        this.userId = this.core.me?.id;
+        this.refreshWarehouses();
+      },
+      error: () => { this.authed = false; this.refreshWarehouses(); }
+    });
+  }
   refreshWarehouses() {
     this.whApi.list().subscribe({ next: (res) => this.warehouses = res.data, error: () => this.error = 'Failed to load' });
   }
@@ -81,18 +103,25 @@ class AppComponent {
     const form = ev.target as HTMLFormElement;
     const name = (form.elements.namedItem('name') as HTMLInputElement).value.trim();
     const location = (form.elements.namedItem('location') as HTMLInputElement).value.trim();
+    const latRaw = (form.elements.namedItem('lat') as HTMLInputElement)?.value;
+    const lngRaw = (form.elements.namedItem('lng') as HTMLInputElement)?.value;
+    const state = (form.elements.namedItem('state') as HTMLSelectElement)?.value || 'available';
+    const isMultiUnit = (form.elements.namedItem('isMultiUnit') as HTMLInputElement)?.checked || false;
     if (!name) return;
-    this.whApi.create({ name, location }).subscribe({ next: () => { form.reset(); this.refreshWarehouses(); }, error: () => this.error = 'Create failed' });
+    const lat = latRaw ? parseFloat(latRaw) : undefined;
+    const lng = lngRaw ? parseFloat(lngRaw) : undefined;
+    this.whApi.create({ name, location, lat: lat as any, lng: lng as any, state: state as any, isMultiUnit: isMultiUnit as any } as any, this.userId)
+      .subscribe({ next: () => { form.reset(); this.refreshWarehouses(); }, error: () => this.error = 'Create failed' });
   }
   onUpdateWarehouse(ev: Event, id: string) {
     ev.preventDefault();
     const form = ev.target as HTMLFormElement;
     const name = (form.elements.namedItem('name') as HTMLInputElement).value.trim();
     const location = (form.elements.namedItem('location') as HTMLInputElement).value.trim();
-    this.whApi.update(id, { name, location }).subscribe({ next: () => { this.editId = null; this.refreshWarehouses(); }, error: () => this.error = 'Update failed' });
+    this.whApi.update(id, { name, location } as any, this.userId).subscribe({ next: () => { this.editId = null; this.refreshWarehouses(); }, error: () => this.error = 'Update failed' });
   }
   onDeleteWarehouse(id: string) {
-    this.whApi.remove(id).subscribe({ next: () => { this.refreshWarehouses(); if (this.selected && this.selected.id === id) { this.selected = null; this.inventory = []; } }, error: () => this.error = 'Delete failed' });
+    this.whApi.remove(id, this.userId).subscribe({ next: () => { this.refreshWarehouses(); if (this.selected && this.selected.id === id) { this.selected = null; this.inventory = []; } }, error: () => this.error = 'Delete failed' });
   }
   onCreateItem(ev: Event) {
     ev.preventDefault();
