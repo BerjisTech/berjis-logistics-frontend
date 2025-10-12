@@ -9,7 +9,8 @@ RUN yarn build
 
 # Runtime stage
 FROM nginx:1.27-alpine
-COPY --from=build /app/dist/logistics /usr/share/nginx/html
+# Angular 17+ application builder outputs browser assets under dist/logistics/browser
+COPY --from=build /app/dist/logistics/browser /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
