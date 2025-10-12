@@ -1,0 +1,59 @@
+<div style="font-family: Inter, Arial, sans-serif; padding: 32px; max-width: 960px; margin: 0 auto;">
+  <h2>Manage Storage</h2>
+  <p>Create storage locations, manage units and staff. Requires login.</p>
+  <form (submit)="onCreateWarehouse($event)">
+    <input placeholder="Name" name="name" required />
+    <input placeholder="Location" name="location" />
+    <input type="number" step="any" placeholder="Lat" name="lat" />
+    <input type="number" step="any" placeholder="Lng" name="lng" />
+    <select name="state">
+      <option value="available">available</option>
+      <option value="occupied">occupied</option>
+      <option value="maintenance">maintenance</option>
+    </select>
+    <label><input type="checkbox" name="isMultiUnit" /> Multi-unit</label>
+    <button type="submit">Create</button>
+  </form>
+  <div style="margin: 8px 0;">
+    <app-map-picker (selected)="onMapSelected($event)"></app-map-picker>
+  </div>
+
+  <h3>My Warehouses</h3>
+  <ul>
+    <li *ngFor="let w of warehouses" (click)="select(w)" style="cursor:pointer;">
+      <strong>{{w.name}}</strong> <small *ngIf="w['state']">— {{w['state']}}</small>
+    </li>
+  </ul>
+
+  <section *ngIf="selected">
+    <h4>Units — {{selected.name}}</h4>
+    <form (submit)="onCreateUnit($event)">
+      <input placeholder="Name" name="name" required />
+      <input type="number" step="any" placeholder="Area (sqm)" name="areaSqm" />
+      <select name="state">
+        <option value="available">available</option>
+        <option value="occupied">occupied</option>
+        <option value="maintenance">maintenance</option>
+      </select>
+      <button type="submit">Add Unit</button>
+    </form>
+    <ul>
+      <li *ngFor="let u of units">{{u.name}} <small>— {{u.state}}</small></li>
+    </ul>
+
+    <h4>Staff</h4>
+    <form (submit)="onInviteStaff($event)">
+      <input placeholder="User ID" name="userId" required />
+      <select name="role">
+        <option value="staff">staff</option>
+        <option value="admin">admin</option>
+        <option value="viewer">viewer</option>
+      </select>
+      <button type="submit">Invite</button>
+    </form>
+    <ul>
+      <li *ngFor="let s of staff">{{s.userId}} — {{s.role}}</li>
+    </ul>
+  </section>
+</div>
+
