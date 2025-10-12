@@ -9,5 +9,5 @@ export interface Me { id: string; email?: string; name?: string }
 export class ApiService {
   me: Me | null = null;
   constructor(private http: HttpClient) {}
-  verify() { return this.http.post<any>(`${apiBase}/v1/auth/verify`, {}); }
+  verify() { return this.http.post<any>(`${apiBase}/v1/auth/verify`, {}, { withCredentials: true }); }
 }
