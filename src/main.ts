@@ -29,6 +29,10 @@ import { ApiService } from "./app/api.service";
       <label><input type="checkbox" name="isMultiUnit" /> Multi-unit</label>
       <button type="submit">Create</button>
     </form>
+    <div *ngIf="authed" style="margin: 8px 0;">
+      <button (click)="toggleMap()">{{ showMap ? 'Hide' : 'Show' }} Map Picker</button>
+    </div>
+    <div *ngIf="showMap" id="map" style="height: 320px; border-radius: 8px; overflow: hidden; margin-bottom: 16px;"></div>
     <div *ngIf="error" style="color:#b00; margin:8px 0">{{error}}</div>
     <ul>
       <li *ngFor="let w of warehouses" [style.marginBottom.px]="8">
@@ -78,6 +82,9 @@ class AppComponent {
   editId: string | null = null;
   authed = false;
   userId: string | undefined;
+  showMap = false;
+  private mapInited = false;
+  private map: any;
   constructor() {
     this.core.verify().subscribe({
       next: (res: any) => {
@@ -88,6 +95,30 @@ class AppComponent {
       },
       error: () => { this.authed = false; this.refreshWarehouses(); }
     });
+  }
+  toggleMap() {
+    this.showMap = !this.showMap;
+    if (this.showMap && !this.mapInited) {
+      setTimeout(() => {
+        // @ts-ignore
+        const L = (window as any).L; if (!L) return;
+        this.map = L.map('map').setView([0.0236, 37.9062], 6);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap'
+        }).addTo(this.map);
+        let marker: any = null;
+        this.map.on('click', (e: any) => {
+          const { lat, lng } = e.latlng;
+          const latInput = document.querySelector('input[name="lat"]') as HTMLInputElement;
+          const lngInput = document.querySelector('input[name="lng"]') as HTMLInputElement;
+          if (latInput) latInput.value = lat.toFixed(6);
+          if (lngInput) lngInput.value = lng.toFixed(6);
+          if (marker) { marker.setLatLng([lat, lng]); } else { marker = L.marker([lat, lng]).addTo(this.map); }
+        });
+        this.mapInited = true;
+      }, 0);
+    }
   }
   refreshWarehouses() {
     this.whApi.list().subscribe({ next: (res) => this.warehouses = res.data, error: () => this.error = 'Failed to load' });
