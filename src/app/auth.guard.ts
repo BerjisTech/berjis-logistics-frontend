@@ -1,12 +1,12 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { ApiService } from './api.service';
-import { map, catchError, of } from 'rxjs';
+import { from, map, catchError, of } from 'rxjs';
 
 export const authGuard: CanActivateFn = () => {
   const api = inject(ApiService);
   const router = inject(Router);
-  return api.verify().pipe(
+  return from(api.ensureAuth()).pipe(
     map((res: any) => {
       const valid = !!res?.data?.valid;
       if (!valid) router.navigateByUrl('/');
