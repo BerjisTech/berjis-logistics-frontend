@@ -11,7 +11,7 @@ export interface Me { id: string; email?: string; name?: string }
 export class ApiService {
   me: Me | null = null;
   constructor(private http: HttpClient) {}
-  verify() { return this.http.post<any>(`${apiBase}/v1/auth/verify`, {}, { withCredentials: true }); }
+  verify() { return this.http.get<any>(`${apiBase}/v1/auth/verify`, { withCredentials: true }); }
   refresh() { return this.http.post<any>(`${apiBase}/v1/auth/refresh`, {}, { withCredentials: true }); }
   async ensureAuth(): Promise<any> {
     try {
