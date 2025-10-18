@@ -1,0 +1,11 @@
+<div style="font-family: Inter, Arial, sans-serif; padding: 32px; max-width: 1200px; margin: 0 auto;">
+  <h2>Live Tracking Demo</h2>
+  <p>Subscribe to live positions for a vehicle or asset. This demo uses the authenticated WebSocket and plots markers on a map.</p>
+  <form (submit)="$event.preventDefault(); connect();" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
+    <input [(ngModel)]="vehicleId" name="vehicleId" placeholder="Vehicle ID (optional)" style="flex:1; min-width:220px; padding:8px; border:1px solid #ddd; border-radius:8px;" />
+    <input [(ngModel)]="assetId" name="assetId" placeholder="Asset ID (optional)" style="flex:1; min-width:220px; padding:8px; border:1px solid #ddd; border-radius:8px;" />
+    <button type="submit" style="padding:8px 12px;">Connect</button>
+  </form>
+  <div #map class="map"></div>
+</div>
+

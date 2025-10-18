@@ -7,9 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+      .map { width: 100%; height: 420px; border-radius: 12px; border: 1px solid #ddd; }
+    </style>
   </head>
   <body>
     <app-root>Loading…</app-root>
+    <script>
+      window.__ENV = window.__ENV || {};
+      // Reuse Mapbox token from games/conquer
+      if (!window.__ENV.mapboxToken) {
+        window.__ENV.mapboxToken = 'pk.eyJ1IjoibG9yZHNvbWJvIiwiYSI6ImNsNWJjOGdoejA2NXQzanNlNGpqb2Y5d3EifQ.YyGLTwRRa6ZqeNK7c93Rig';
+      }
+      window.__ENV.mapboxStyle = window.__ENV.mapboxStyle || 'mapbox/streets-v12';
+    </script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   </body>
   </html>

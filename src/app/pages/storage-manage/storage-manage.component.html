@@ -49,11 +49,21 @@
         <option value="admin">admin</option>
         <option value="viewer">viewer</option>
       </select>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap:6px; margin:8px 0; font-size: 12px;">
+        <label><input type="checkbox" name="perm_edit_prices" /> Edit prices</label>
+        <label><input type="checkbox" name="perm_edit_availability" /> Edit availability</label>
+        <label><input type="checkbox" name="perm_manage_discounts" /> Manage discounts</label>
+        <label><input type="checkbox" name="perm_manage_inventory" /> Manage inventory</label>
+        <label><input type="checkbox" name="perm_manage_units" /> Manage units</label>
+        <label><input type="checkbox" name="perm_manage_staff" /> Manage staff</label>
+      </div>
       <button type="submit">Invite</button>
     </form>
     <ul>
-      <li *ngFor="let s of staff">{{s.userId}} — {{s.role}}</li>
+      <li *ngFor="let s of staff">
+        {{s.userId}} — {{s.role}}
+        <small *ngIf="s.permissions"> — perms: {{ s.permissions | json }}</small>
+      </li>
     </ul>
   </section>
 </div>
-

@@ -1,0 +1,37 @@
+<div style="font-family: Inter, Arial, sans-serif; padding: 32px; max-width: 1200px; margin: 0 auto;">
+  <h2>Products</h2>
+  <p>Discover products available across warehouses. Booking/purchase requires an account.</p>
+  <form (submit)="$event.preventDefault(); search();" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
+    <input [(ngModel)]="q" name="q" placeholder="Search by name or SKU" style="flex:1; min-width:240px; padding:8px; border:1px solid #ddd; border-radius:8px;" />
+    <input [(ngModel)]="near" name="near" placeholder="lat,lng (optional)" style="width:200px; padding:8px; border:1px solid #ddd; border-radius:8px;" />
+    <input type="number" [(ngModel)]="radiusKm" name="radius" placeholder="radius km" style="width:120px; padding:8px; border:1px solid #ddd; border-radius:8px;" />
+    <button type="button" (click)="geolocate()" style="padding:8px 12px;">Use my location</button>
+    <button type="submit" style="padding:8px 12px;">Search</button>
+  </form>
+
+  <div *ngIf="loading">Loading…</div>
+  <table *ngIf="!loading" style="width:100%; border-collapse: collapse;">
+    <thead>
+      <tr style="text-align:left; border-bottom:1px solid #eee;">
+        <th style="padding:8px;">Name</th>
+        <th style="padding:8px;">SKU</th>
+        <th style="padding:8px;">Qty</th>
+        <th style="padding:8px;">Warehouse</th>
+        <th style="padding:8px;">Location</th>
+        <th style="padding:8px;">Distance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let it of items" style="border-bottom:1px solid #f5f5f5;">
+        <td style="padding:8px;">{{it.name}}</td>
+        <td style="padding:8px;">{{it.sku}}</td>
+        <td style="padding:8px;">{{it.quantity}}</td>
+        <td style="padding:8px;">{{it.warehouseName}}</td>
+        <td style="padding:8px;">{{it.location}}</td>
+        <td style="padding:8px;" *ngIf="it.distanceKm">{{it.distanceKm | number:'1.0-1'}} km</td>
+        <td style="padding:8px;" *ngIf="!it.distanceKm">—</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

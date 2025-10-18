@@ -5,6 +5,9 @@ import { provideRouter, Routes } from '@angular/router';
 import { HomePageComponent } from './app/pages/home/home.component';
 import { StorageListPageComponent } from './app/pages/storage/storage-list.component';
 import { StorageManagePageComponent } from './app/pages/storage-manage/storage-manage.component';
+import { ProductsListPageComponent } from './app/pages/products/products-list.component';
+import { TransportListPageComponent } from './app/pages/transport/transport-list.component';
+import { TrackingDemoPageComponent } from './app/pages/tracking/tracking-demo.component';
 import { authGuard } from './app/auth.guard';
 import { AppComponent } from './app/app.component';
 import { DashboardPageComponent } from './app/pages/dashboard/dashboard.component';
@@ -13,6 +16,9 @@ const routes: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'dashboard', component: DashboardPageComponent, canActivate: [authGuard] },
   { path: 'storage', component: StorageListPageComponent },
+  { path: 'products', component: ProductsListPageComponent },
+  { path: 'transport', component: TransportListPageComponent },
+  { path: 'tracking-demo', component: TrackingDemoPageComponent, canActivate: [authGuard] },
   { path: 'storage/manage', component: StorageManagePageComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

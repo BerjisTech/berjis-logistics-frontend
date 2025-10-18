@@ -24,8 +24,11 @@ export class StorageManagePageComponent {
   lat?: number; lng?: number;
 
   constructor() {
-    this.core.verify().subscribe({ next: (r: any) => this.userId = r?.data?.uid?.toString(), error: () => {} });
-    this.wh.list().subscribe({ next: r => this.warehouses = r.data, error: () => this.warehouses = [] });
+    this.core.verify().subscribe({ next: (r: any) => { this.userId = r?.data?.uid?.toString(); this.refreshWarehouses(); }, error: () => { this.refreshWarehouses(); } });
+  }
+
+  refreshWarehouses() {
+    this.wh.list(this.userId).subscribe({ next: r => this.warehouses = r.data, error: () => this.warehouses = [] });
   }
 
   onMapSelected(p: {lat:number; lng:number}) {
@@ -55,7 +58,7 @@ export class StorageManagePageComponent {
     const areaRaw = (f.elements.namedItem('areaSqm') as HTMLInputElement).value;
     const state = (f.elements.namedItem('state') as HTMLSelectElement).value || 'available';
     const area = areaRaw ? parseFloat(areaRaw) : undefined;
-    fetch(`/svc/v1/warehouses/${this.selected.id}/units`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, areaSqm: area, state }) })
+    fetch(`/v1/warehouses/${this.selected.id}/units`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(this.userId ? {'X-User-ID': this.userId} : {}) }, body: JSON.stringify({ name, areaSqm: area, state }) })
       .then(() => this.refreshUnits());
   }
 
@@ -63,10 +66,18 @@ export class StorageManagePageComponent {
     ev.preventDefault(); if (!this.selected) return; const f = ev.target as HTMLFormElement;
     const uid = (f.elements.namedItem('userId') as HTMLInputElement).value.trim();
     const role = (f.elements.namedItem('role') as HTMLSelectElement).value || 'staff';
-    fetch(`/svc/v1/warehouses/${this.selected.id}/staff`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: uid, role }) })
+    const permissions = {
+      edit_prices: (f.elements.namedItem('perm_edit_prices') as HTMLInputElement)?.checked || false,
+      edit_availability: (f.elements.namedItem('perm_edit_availability') as HTMLInputElement)?.checked || false,
+      manage_discounts: (f.elements.namedItem('perm_manage_discounts') as HTMLInputElement)?.checked || false,
+      manage_inventory: (f.elements.namedItem('perm_manage_inventory') as HTMLInputElement)?.checked || false,
+      manage_units: (f.elements.namedItem('perm_manage_units') as HTMLInputElement)?.checked || false,
+      manage_staff: (f.elements.namedItem('perm_manage_staff') as HTMLInputElement)?.checked || false,
+    };
+    fetch(`/v1/warehouses/${this.selected.id}/staff`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(this.userId ? {'X-User-ID': this.userId} : {}) }, body: JSON.stringify({ userId: uid, role, permissions }) })
       .then(() => this.refreshStaff());
   }
 
-  refreshUnits() { if (!this.selected) return; fetch(`/svc/v1/warehouses/${this.selected.id}/units`).then(r => r.json()).then(r => this.units = r?.data || []); }
-  refreshStaff() { if (!this.selected) return; fetch(`/svc/v1/warehouses/${this.selected.id}/staff`).then(r => r.json()).then(r => this.staff = r?.data || []); }
+  refreshUnits() { if (!this.selected) return; fetch(`/v1/warehouses/${this.selected.id}/units`, { headers: this.userId ? {'X-User-ID': this.userId} : {} }).then(r => r.json()).then(r => this.units = r?.data || []); }
+  refreshStaff() { if (!this.selected) return; fetch(`/v1/warehouses/${this.selected.id}/staff`, { headers: this.userId ? {'X-User-ID': this.userId} : {} }).then(r => r.json()).then(r => this.staff = r?.data || []); }
 }

@@ -1,0 +1,18 @@
+<div style="font-family: Inter, Arial, sans-serif; padding: 32px; max-width: 960px; margin: 0 auto;">
+  <h2>Transport</h2>
+  <p>Discover available transport options. Booking requires an account; managing requires ownership.</p>
+  <form (submit)="$event.preventDefault(); search();" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
+    <input [(ngModel)]="q" name="q" placeholder="Filter by kind (e.g., truck, van)" style="flex:1; min-width:240px; padding:8px; border:1px solid #ddd; border-radius:8px;" />
+    <input type="number" [(ngModel)]="minCapacity" name="minCapacity" placeholder="Min capacity (kg)" style="width:200px; padding:8px; border:1px solid #ddd; border-radius:8px;" />
+    <button type="submit" style="padding:8px 12px;">Search</button>
+  </form>
+
+  <div *ngIf="loading">Loading…</div>
+  <ul *ngIf="!loading">
+    <li *ngFor="let v of items">
+      <strong>{{v.kind || 'vehicle'}}</strong>
+      <small *ngIf="v.capacityKg"> — {{v.capacityKg | number:'1.0-0'}} kg</small>
+    </li>
+  </ul>
+</div>
+

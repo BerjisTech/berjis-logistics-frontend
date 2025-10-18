@@ -1,12 +1,22 @@
-<div style="font-family: Inter, Arial, sans-serif; padding: 32px; max-width: 960px; margin: 0 auto;">
-  <h2>Storage</h2>
-  <p>Browse available warehouses and storage locations.</p>
+<div style="font-family: Inter, Arial, sans-serif; padding: 32px; max-width: 1200px; margin: 0 auto;">
+  <h2>Find Storage</h2>
+  <p>Search warehouses by location or name. Booking requires an account; managing requires ownership.</p>
+  <form (submit)="$event.preventDefault(); search();" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
+    <input [(ngModel)]="q" name="q" placeholder="Search by name (optional)" style="flex:1; min-width:240px; padding:8px; border:1px solid #ddd; border-radius:8px;" />
+    <input [(ngModel)]="near" name="near" placeholder="lat,lng (optional)" style="width:200px; padding:8px; border:1px solid #ddd; border-radius:8px;" />
+    <input type="number" [(ngModel)]="radiusKm" name="radius" placeholder="radius km" style="width:120px; padding:8px; border:1px solid #ddd; border-radius:8px;" />
+    <button type="button" (click)="geolocate()" style="padding:8px 12px;">Use my location</button>
+    <button type="submit" style="padding:8px 12px;">Search</button>
+  </form>
+
+  <div #map class="map" style="margin-bottom:12px;"></div>
+
   <ul>
     <li *ngFor="let w of warehouses">
       <strong>{{w.name}}</strong>
       <span *ngIf="w.location">— {{w.location}}</span>
-      <small *ngIf="w['state']"> — {{w['state']}}</small>
+      <small *ngIf="w.state"> — {{w.state}}</small>
+      <small *ngIf="w.distanceKm"> — {{w.distanceKm | number:'1.0-1'}} km</small>
     </li>
   </ul>
 </div>
-
