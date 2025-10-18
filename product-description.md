@@ -128,7 +128,7 @@ Build a full-stack distributed logistics and commerce platform using **Angular**
 - **Database**: PostgreSQL for relational data, Redis for caching
 - **Real-time**: WebSockets for live tracking and notifications
 - **File Storage**: S3-compatible object storage
-- **Authentication**: JWT-based auth with refresh tokens
+- **Authentication**: JWT-based auth with refresh tokens (provided by the Berjis main API and accessed through the `/landing` app, which serves shared UI for authentication, notifications, support, and other reusable flows)
 
 ### System Components
 1. **Multi-tenant Platform**: Separate workspaces for different user types
@@ -416,6 +416,10 @@ src/app/
 │   └── analytics/
 └── layouts/        # Shell components (header, sidebar)
 ```
+
+### Shared UI via `/landing`
+- Routes for reusable experiences (authentication, notifications, support, etc.) are handled by the Berjis `/landing` app.
+- The logistics frontend integrates by delegating those flows to `/landing` and consuming tokens issued by the Berjis main API.
 
 ### Critical Angular Services
 - `AuthService`: JWT management, user context
