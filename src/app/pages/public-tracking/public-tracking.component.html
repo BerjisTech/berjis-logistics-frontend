@@ -1,0 +1,32 @@
+<div style="font-family: Inter, Arial, sans-serif; padding: 32px; max-width: 900px; margin: 0 auto;">
+  <h2>Track Shipment</h2>
+  <p>Enter your tracking code to view the latest status and location.</p>
+  <form (submit)="$event.preventDefault(); track();" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
+    <input [(ngModel)]="code" name="code" placeholder="Tracking code" style="flex:1; min-width:260px; padding:10px; border:1px solid #ddd; border-radius:8px;" />
+    <button type="submit" [disabled]="loading" style="padding:10px 14px;">{{ loading ? 'Tracking…' : 'Track' }}</button>
+  </form>
+
+  <div *ngIf="error" style="color:#b00020; padding:8px 0;">{{ error }}</div>
+
+  <div *ngIf="result as r" style="margin-top:16px; border:1px solid #eee; border-radius:8px; padding:16px;">
+    <h3 style="margin-top:0;">Delivery</h3>
+    <div>Status: <strong>{{ r.delivery?.status || 'unknown' }}</strong></div>
+    <div *ngIf="r.delivery?.plate">Vehicle: {{ r.delivery.plate }}</div>
+    <div *ngIf="r.delivery?.lat != null && r.delivery?.lng != null">Latest Position: {{ r.delivery.lat }}, {{ r.delivery.lng }}</div>
+    <div *ngIf="r.delivery?.lastSeen">Last Seen: {{ r.delivery.lastSeen | date:'medium' }}</div>
+
+    <div *ngIf="(r.route?.length || 0) > 0" style="margin-top:12px;">
+      <h4 style="margin: 8px 0;">Route</h4>
+      <ul style="padding-left:18px;">
+        <li *ngFor="let s of r.route">#{{ s.seq }} – {{ s.address }} ({{ s.status }})</li>
+      </ul>
+    </div>
+
+    <div *ngIf="(r.positions?.length || 0) > 0" style="margin-top:12px;">
+      <h4 style="margin: 8px 0;">Recent Positions</h4>
+      <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 12px; line-height: 1.6;">
+        <div *ngFor="let p of r.positions">{{ p.ts | date:'short' }} – {{ p.lat }}, {{ p.lng }}</div>
+      </div>
+    </div>
+  </div>
+</div>

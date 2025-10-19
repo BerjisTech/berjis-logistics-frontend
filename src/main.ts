@@ -8,7 +8,9 @@ import { StorageListPageComponent } from './app/pages/storage/storage-list.compo
 import { StorageManagePageComponent } from './app/pages/storage-manage/storage-manage.component';
 import { ProductsListPageComponent } from './app/pages/products/products-list.component';
 import { TransportListPageComponent } from './app/pages/transport/transport-list.component';
-import { TrackingDemoPageComponent } from './app/pages/tracking/tracking-demo.component';
+
+import { DriverJobsPageComponent } from './app/pages/driver/driver-jobs.component';
+import { PublicTrackingPageComponent } from './app/pages/public-tracking/public-tracking.component';
 import { authGuard } from './app/auth.guard';
 import { AppComponent } from './app/app.component';
 import { DashboardPageComponent } from './app/pages/dashboard/dashboard.component';
@@ -28,11 +30,12 @@ const routes: Routes = [
     { path: 'products', component: DashboardProductsComponent },
     { path: 'crm', component: DashboardCrmComponent },
     { path: 'driver', component: DashboardDriverComponent },
-  ] },
+   ] },
+  { path: 'driver-jobs', component: DriverJobsPageComponent, canActivate: [authGuard] },
   { path: 'storage', component: StorageListPageComponent },
   { path: 'products', component: ProductsListPageComponent },
   { path: 'transport', component: TransportListPageComponent },
-  { path: 'tracking-demo', component: TrackingDemoPageComponent, canActivate: [authGuard] },
+  { path: 'track', component: PublicTrackingPageComponent },
   { path: 'storage/manage', component: StorageManagePageComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];
@@ -43,3 +46,8 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes)
   ]
 }).catch(err => console.error(err));
+
+
+
+
+
