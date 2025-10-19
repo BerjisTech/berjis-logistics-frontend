@@ -1,39 +1,46 @@
-<div class="fixed w-full h-full top-0 left-0 bottom-0 right-0 flex items-start justify-start overflow-hidden">
-  <div #leftSideBar class="w-[250px] h-full overflow-hidden flex flex-col border-r border-slate-200 dark:border-slate-800"></div>
-  <div #mainAdminArea class="flex-grow overflow-hidden">
-    <div #adminheader class="h-[70px] shadow w-full"></div>
-    <div #mainAdminContent class="h-[calc(100vh-70px)] w-full overflow-x-hidden overflow-y-auto">
-      <div style="font-family: Inter, Arial, sans-serif; padding: 32px; max-width: 960px; margin: 0 auto;">
-        <h2>Dashboard</h2>
-        <p>Enroll into roles to unlock features. You can be a storage owner, truck owner, driver, or general staff
-          (invited by
-          a storage owner).</p>
-        <div *ngIf="error()" style="color:#b00;">{{ error() }}</div>
-        <div
-          style="display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin-top:16px;">
-          <div style="border:1px solid #ddd; border-radius:12px; padding:16px;">
-            <h3>Storage Owner</h3>
-            <p>Create and manage storage units, invite staff.</p>
-            <button (click)="toggle('storage_owner')">{{ roles().storage_owner ? 'Unenroll' : 'Enroll' }}</button>
-          </div>
-          <div style="border:1px solid #ddd; border-radius:12px; padding:16px;">
-            <h3>Truck Owner</h3>
-            <p>Add trucks and hire drivers.</p>
-            <button (click)="toggle('truck_owner')">{{ roles().truck_owner ? 'Unenroll' : 'Enroll' }}</button>
-          </div>
-          <div style="border:1px solid #ddd; border-radius:12px; padding:16px;">
-            <h3>Driver</h3>
-            <p>Work as a driver with your truck or for others.</p>
-            <button (click)="toggle('driver')">{{ roles().driver ? 'Unenroll' : 'Enroll' }}</button>
-          </div>
-          <div style="border:1px solid #ddd; border-radius:12px; padding:16px;">
-            <h3>General Staff</h3>
-            <p>Get invited by a storage owner to help manage units.</p>
-            <button (click)="toggle('staff')">{{ roles().staff ? 'Unenroll' : 'Enroll' }}</button>
-          </div>
+<div class="fixed w-full h-full top-0 left-0 bottom-0 right-0 flex items-start justify-start overflow-hidden" style="font-family: Inter, Arial, sans-serif;">
+  <!-- Left Sidebar: Navigation -->
+  <div class="w-[250px] h-full overflow-hidden flex flex-col border-r border-slate-200 dark:border-slate-800" style="padding:12px; gap:6px;">
+    <h3 style="margin:8px 0;">Dashboard</h3>
+    <a routerLink="/dashboard" style="text-decoration:none; color:inherit; padding:8px; border-radius:8px; display:block;">Overview</a>
+    <a routerLink="/dashboard/storage" style="text-decoration:none; color:inherit; padding:8px; border-radius:8px; display:block;">Storage</a>
+    <a routerLink="/dashboard/fleet" style="text-decoration:none; color:inherit; padding:8px; border-radius:8px; display:block;">Fleet</a>
+    <a routerLink="/dashboard/products" style="text-decoration:none; color:inherit; padding:8px; border-radius:8px; display:block;">Products</a>
+    <a routerLink="/dashboard/crm" style="text-decoration:none; color:inherit; padding:8px; border-radius:8px; display:block;">CRM</a>
+    <a routerLink="/dashboard/driver" style="text-decoration:none; color:inherit; padding:8px; border-radius:8px; display:block;">Driver</a>
+  </div>
+
+  <!-- Main Area -->
+  <div class="flex-grow overflow-hidden">
+    <!-- Header with global search -->
+    <div class="h-[70px] shadow w-full" style="display:flex; align-items:center; padding:0 16px; gap:12px; position:relative;">
+      <input (input)="onSearchInput($event)" [value]="q()" placeholder="Search warehouses, vehicles, contacts" style="flex:1; max-width:720px; padding:10px; border:1px solid #ddd; border-radius:10px;" />
+      <div *ngIf="results().length" style="position:absolute; top:56px; left:16px; right:16px; background:#fff; border:1px solid #eee; border-radius:10px; padding:8px; max-width:820px;">
+        <div *ngFor="let r of results()" (click)="clearSearch()" style="padding:6px 8px; cursor:pointer; border-radius:6px;">
+          <a [routerLink]="r.route" style="text-decoration:none; color:inherit;">{{r.label}}</a>
         </div>
       </div>
     </div>
+    <!-- Content -->
+    <div class="h-[calc(100vh-70px)] w-full overflow-x-hidden overflow-y-auto">
+      <div style="padding: 24px; max-width: 1100px;">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
   </div>
-  <div #rightSideBar class="w-[250px] h-full overflow-hidden flex flex-col border-l border-slate-200 dark:border-slate-800"></div>
+
+  <!-- Right Sidebar: Useful tools/links -->
+  <div class="w-[250px] h-full overflow-hidden flex flex-col border-l border-slate-200 dark:border-slate-800" style="padding:12px; gap:8px;">
+    <h3 style="margin:8px 0;">Tools</h3>
+    <a routerLink="/storage" style="text-decoration:none; color:inherit; padding:8px; border-radius:8px; display:block; border:1px solid #eee;">Find Storage</a>
+    <a routerLink="/products" style="text-decoration:none; color:inherit; padding:8px; border-radius:8px; display:block; border:1px solid #eee;">Browse Products</a>
+    <a routerLink="/transport" style="text-decoration:none; color:inherit; padding:8px; border-radius:8px; display:block; border:1px solid #eee;">Browse Transport</a>
+    <a routerLink="/tracking-demo" style="text-decoration:none; color:inherit; padding:8px; border-radius:8px; display:block; border:1px solid #eee;">Tracking Demo</a>
+    <div style="margin-top:12px; padding:8px; border:1px solid #eee; border-radius:8px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#0a4;"></span>
+        <span>Service Health: see Dev Toolbar</span>
+      </div>
+    </div>
+  </div>
 </div>

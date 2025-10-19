@@ -1,6 +1,7 @@
 import 'zone.js';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { devUserInterceptor } from './app/dev-user.interceptor';
 import { provideRouter, Routes } from '@angular/router';
 import { HomePageComponent } from './app/pages/home/home.component';
 import { StorageListPageComponent } from './app/pages/storage/storage-list.component';
@@ -11,10 +12,23 @@ import { TrackingDemoPageComponent } from './app/pages/tracking/tracking-demo.co
 import { authGuard } from './app/auth.guard';
 import { AppComponent } from './app/app.component';
 import { DashboardPageComponent } from './app/pages/dashboard/dashboard.component';
+import { DashboardHomeComponent } from './app/pages/dashboard/dashboard-home.component';
+import { DashboardStorageComponent } from './app/pages/dashboard/dashboard-storage.component';
+import { DashboardFleetComponent } from './app/pages/dashboard/dashboard-fleet.component';
+import { DashboardProductsComponent } from './app/pages/dashboard/dashboard-products.component';
+import { DashboardCrmComponent } from './app/pages/dashboard/dashboard-crm.component';
+import { DashboardDriverComponent } from './app/pages/dashboard/dashboard-driver.component';
 
 const routes: Routes = [
   { path: '', component: HomePageComponent },
-  { path: 'dashboard', component: DashboardPageComponent, canActivate: [authGuard] },
+  { path: 'dashboard', component: DashboardPageComponent, canActivate: [authGuard], children: [
+    { path: '', component: DashboardHomeComponent },
+    { path: 'storage', component: DashboardStorageComponent },
+    { path: 'fleet', component: DashboardFleetComponent },
+    { path: 'products', component: DashboardProductsComponent },
+    { path: 'crm', component: DashboardCrmComponent },
+    { path: 'driver', component: DashboardDriverComponent },
+  ] },
   { path: 'storage', component: StorageListPageComponent },
   { path: 'products', component: ProductsListPageComponent },
   { path: 'transport', component: TransportListPageComponent },
@@ -24,5 +38,8 @@ const routes: Routes = [
 ];
 
 bootstrapApplication(AppComponent, {
-  providers: [provideHttpClient(), provideRouter(routes)]
+  providers: [
+    provideHttpClient(withInterceptors([devUserInterceptor])),
+    provideRouter(routes)
+  ]
 }).catch(err => console.error(err));
