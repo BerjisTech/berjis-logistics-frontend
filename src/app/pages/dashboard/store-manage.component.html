@@ -1,0 +1,27 @@
+
+    <h2>Store: {{ store()?.name || '...' }}</h2>
+    <div style="display:flex; gap:12px; align-items:center; margin: 8px 0;">
+      <button (click)="reload()">Refresh</button>
+    </div>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px;">
+      <div>
+        <h3>My Products</h3>
+        <div *ngFor="let p of products()" style="border:1px solid #eee; border-radius:10px; padding:10px; margin-bottom:8px;">
+          <div style="font-weight:600;">{{ p.name }}</div>
+          <div *ngIf="p.sku" style="color:#777;">SKU: {{ p.sku }}</div>
+          <form (submit)="assign($event, p.id)" style="margin-top:8px; display:flex; gap:6px; align-items:center;">
+            <input name="price" placeholder="Price override (optional)" style="padding:6px; border:1px solid #ddd; border-radius:8px; width:160px;" />
+            <button type="submit">Add to Store</button>
+          </form>
+        </div>
+      </div>
+      <div>
+        <h3>Assigned to Store</h3>
+        <div *ngFor="let p of assigned()" style="border:1px solid #eee; border-radius:10px; padding:10px; margin-bottom:8px;">
+          <div style="font-weight:600;">{{ p.name }}</div>
+          <div>Price: <span *ngIf="p.priceOverride != null; else baseP">{{ p.priceOverride }}</span><ng-template #baseP>{{ p.price }}</ng-template> {{ p.currency || '' }}</div>
+          <button (click)="remove(p.id)" style="margin-top:6px;">Remove</button>
+        </div>
+      </div>
+    </div>
+  

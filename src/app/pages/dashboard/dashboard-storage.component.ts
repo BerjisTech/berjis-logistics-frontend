@@ -6,10 +6,8 @@ import { StorageManagePageComponent } from '../storage-manage/storage-manage.com
   selector: 'app-dashboard-storage',
   standalone: true,
   imports: [CommonModule, StorageManagePageComponent],
-  template: `
-    <h2>Storage</h2>
-    <app-storage-manage></app-storage-manage>
-  `
+  templateUrl: './dashboard-storage.component.html'
 })
 export class DashboardStorageComponent {}
+
 

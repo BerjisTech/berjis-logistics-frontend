@@ -1,0 +1,17 @@
+
+    <h2>My Stores</h2>
+    <form (submit)="create($event)" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
+      <input name="name" placeholder="Store name" style="padding:8px; border:1px solid #ddd; border-radius:8px;" />
+      <input name="slug" placeholder="slug (optional)" style="padding:8px; border:1px solid #ddd; border-radius:8px;" />
+      <button type="submit">Create</button>
+    </form>
+    <div *ngIf="message" style="color:#b00020;">{{ message }}</div>
+    <div *ngIf="stores().length === 0" style="color:#555;">No stores yet.</div>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px;">
+      <div *ngFor="let s of stores()" style="border:1px solid #eee; border-radius:10px; padding:12px;">
+        <div style="font-weight:600;">{{ s.name }}</div>
+        <div style="color:#777;">/store/{{ s.slug }}</div>
+        <div style="margin-top:8px;"><a [routerLink]="['/dashboard/stores', s.id, 'manage']">Manage Products</a></div>
+      </div>
+    </div>
+  

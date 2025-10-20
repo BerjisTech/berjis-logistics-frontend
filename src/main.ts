@@ -10,7 +10,8 @@ import { ProductsListPageComponent } from './app/pages/products/products-list.co
 import { TransportListPageComponent } from './app/pages/transport/transport-list.component';
 
 import { DriverJobsPageComponent } from './app/pages/driver/driver-jobs.component';
-import { PublicTrackingPageComponent } from './app/pages/public-tracking/public-tracking.component';
+
+import { StoreLandingPageComponent } from './app/pages/store/store-landing.component';
 import { authGuard } from './app/auth.guard';
 import { AppComponent } from './app/app.component';
 import { DashboardPageComponent } from './app/pages/dashboard/dashboard.component';
@@ -20,11 +21,17 @@ import { DashboardFleetComponent } from './app/pages/dashboard/dashboard-fleet.c
 import { DashboardProductsComponent } from './app/pages/dashboard/dashboard-products.component';
 import { DashboardCrmComponent } from './app/pages/dashboard/dashboard-crm.component';
 import { DashboardDriverComponent } from './app/pages/dashboard/dashboard-driver.component';
+import { PublicTrackingPageComponent } from './app/pages/public-tracking/public-tracking.component';
+
+import { DashboardStoresComponent } from './app/pages/dashboard/dashboard-stores.component';
+import { StoreManagePageComponent } from './app/pages/dashboard/store-manage.component';
 
 const routes: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'dashboard', component: DashboardPageComponent, canActivate: [authGuard], children: [
-    { path: '', component: DashboardHomeComponent },
+    
+    { path: 'stores', component: DashboardStoresComponent },
+    { path: 'stores/:id/manage', component: StoreManagePageComponent },
     { path: 'storage', component: DashboardStorageComponent },
     { path: 'fleet', component: DashboardFleetComponent },
     { path: 'products', component: DashboardProductsComponent },
@@ -36,6 +43,7 @@ const routes: Routes = [
   { path: 'products', component: ProductsListPageComponent },
   { path: 'transport', component: TransportListPageComponent },
   { path: 'track', component: PublicTrackingPageComponent },
+  { path: 'store/:slug', component: StoreLandingPageComponent },
   { path: 'storage/manage', component: StorageManagePageComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];
@@ -46,6 +54,11 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes)
   ]
 }).catch(err => console.error(err));
+
+
+
+
+
 
 
 

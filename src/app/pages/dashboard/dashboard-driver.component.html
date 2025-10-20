@@ -1,0 +1,17 @@
+
+    <h2>Driver</h2>
+    <div *ngIf="!driver()">
+      <p>Apply to be a driver.</p>
+      <form (submit)="apply($event)" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <input name="fullName" placeholder="Full name" style="padding:8px; border:1px solid #ddd; border-radius:8px;" />
+        <input name="licenseNo" placeholder="License No" style="padding:8px; border:1px solid #ddd; border-radius:8px;" />
+        <input name="phone" placeholder="Phone" style="padding:8px; border:1px solid #ddd; border-radius:8px;" />
+        <button type="submit">Apply</button>
+      </form>
+    </div>
+    <div *ngIf="driver()">
+      <p>Status: <strong>{{driver()?.status}}</strong></p>
+      <p>Name: {{driver()?.fullName}} <span *ngIf="driver()?.phone"> — {{driver()?.phone}}</span></p>
+      <button (click)="reload()">Refresh</button> <a routerLink="/driver-jobs" style="margin-left:8px;">Job Board</a>
+    </div>
+  

@@ -5,36 +5,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-dev-toolbar',
   standalone: true,
   imports: [CommonModule],
-  template: `
-  <div *ngIf="show" style="position:fixed; bottom:16px; right:16px; background:#111; color:#fff; padding:10px 12px; border-radius:10px; font-size:12px; box-shadow:0 4px 12px rgba(0,0,0,.2); z-index:1000; width: 360px;">
-    <div style="display:flex; gap:6px; align-items:center; justify-content:space-between; margin-bottom:6px;">
-      <div style="display:flex; gap:8px; align-items:center;">
-        <span [style.color]="healthColor()" style="display:inline-block; width:10px; height:10px; border-radius:50%; background: currentColor;"></span>
-        <span>{{ healthText() }}</span>
-      </div>
-      <button (click)="ping()" style="background:#222; color:#ddd; border:none; border-radius:6px; padding:2px 6px; cursor:pointer;">Ping</button>
-    </div>
-    <div style="display:flex; flex-direction:column; gap:6px;">
-      <div style="display:flex; gap:6px; align-items:center;">
-        <span style="min-width:72px; opacity:.9;">Dev User</span>
-        <input [value]="devId()" (input)="onInput($event)" placeholder="user-id" style="padding:4px 6px; border-radius:6px; border:none; outline:none; flex:1;" />
-        <button (click)="save()" style="background:#09f; color:#fff; border:none; border-radius:6px; padding:4px 8px; cursor:pointer;">Save</button>
-        <button (click)="clear()" style="background:#444; color:#fff; border:none; border-radius:6px; padding:4px 8px; cursor:pointer;">Clear</button>
-      </div>
-      <div style="display:flex; gap:6px; align-items:center;">
-        <span style="min-width:72px; opacity:.9;">Logistics</span>
-        <input [value]="apiBase()" (input)="onBase($event)" placeholder="http://localhost:8081" style="padding:4px 6px; border-radius:6px; border:none; outline:none; flex:1;" />
-        <button (click)="saveBase()" style="background:#0a4; color:#fff; border:none; border-radius:6px; padding:4px 8px; cursor:pointer;">Apply</button>
-      </div>
-      <div style="display:flex; gap:6px; align-items:center;">
-        <span style="min-width:72px; opacity:.9;">Core API</span>
-        <input [value]="coreBase()" (input)="onCore($event)" placeholder="http://api.berjis.test" style="padding:4px 6px; border-radius:6px; border:none; outline:none; flex:1;" />
-        <button (click)="saveCore()" style="background:#0a4; color:#fff; border:none; border-radius:6px; padding:4px 8px; cursor:pointer;">Apply</button>
-      </div>
-    </div>
-    <div style="margin-top:6px; opacity:.8;">X-User-ID is added to logistics API calls when no Authorization header is present.</div>
-  </div>
-  `
+  templateUrl: './dev-toolbar.component.html'
 })
 export class DevToolbarComponent {
   show = false;
@@ -112,3 +83,4 @@ export class DevToolbarComponent {
     }
   }
 }
+

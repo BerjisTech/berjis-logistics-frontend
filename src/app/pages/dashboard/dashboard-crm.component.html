@@ -1,0 +1,47 @@
+
+    <h2>CRM</h2>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(320px,1fr)); gap:16px;">
+      <div style="border:1px solid #eee; border-radius:12px; padding:12px;">
+        <h3>Clients</h3>
+        <form (submit)="add('client',$event)" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:8px;">
+          <input name="name" placeholder="Name" required style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <input name="company" placeholder="Company" style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <input name="email" placeholder="Email" style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <input name="phone" placeholder="Phone" style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <input name="notes" placeholder="Notes" style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <button type="submit">Add</button>
+        </form>
+        <ul>
+          <li *ngFor="let c of clients">{{c.name}} <small *ngIf="c.company">— {{c.company}}</small> <button (click)="remove('client', c.id)">Remove</button></li>
+        </ul>
+      </div>
+      <div style="border:1px solid #eee; border-radius:12px; padding:12px;">
+        <h3>Suppliers</h3>
+        <form (submit)="add('supplier',$event)" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:8px;">
+          <input name="name" placeholder="Name" required style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <input name="company" placeholder="Company" style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <input name="email" placeholder="Email" style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <input name="phone" placeholder="Phone" style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <input name="notes" placeholder="Notes" style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <button type="submit">Add</button>
+        </form>
+        <ul>
+          <li *ngFor="let c of suppliers">{{c.name}} <small *ngIf="c.company">— {{c.company}}</small> <button (click)="remove('supplier', c.id)">Remove</button></li>
+        </ul>
+      </div>
+      <div style="border:1px solid #eee; border-radius:12px; padding:12px;">
+        <h3>Wholesalers</h3>
+        <form (submit)="add('wholesaler',$event)" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:8px;">
+          <input name="name" placeholder="Name" required style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <input name="company" placeholder="Company" style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <input name="email" placeholder="Email" style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <input name="phone" placeholder="Phone" style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <input name="notes" placeholder="Notes" style="padding:6px; border:1px solid #ddd; border-radius:6px;" />
+          <button type="submit">Add</button>
+        </form>
+        <ul>
+          <li *ngFor="let c of wholesalers">{{c.name}} <small *ngIf="c.company">— {{c.company}}</small> <button (click)="remove('wholesaler', c.id)">Remove</button></li>
+        </ul>
+      </div>
+    </div>
+  

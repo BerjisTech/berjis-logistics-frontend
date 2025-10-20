@@ -1,0 +1,17 @@
+
+    <h2>Fleet</h2>
+    <form (submit)="addVehicle($event)" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
+      <input name="plate" placeholder="Plate (e.g., KAA 123A)" required style="padding:8px; border:1px solid #ddd; border-radius:8px;" />
+      <input name="kind" placeholder="Kind (truck, van, bike)" style="padding:8px; border:1px solid #ddd; border-radius:8px;" />
+      <input name="capacityKg" type="number" placeholder="Capacity (kg)" style="padding:8px; border:1px solid #ddd; border-radius:8px; width:160px;" />
+      <button type="submit">Add Vehicle</button>
+    </form>
+    <ul>
+      <li *ngFor="let v of vehicles">
+        <strong>{{v.plate}}</strong>
+        <small *ngIf="v.kind"> — {{v.kind}}</small>
+        <small *ngIf="v.capacityKg"> — {{v.capacityKg | number:'1.0-0'}} kg</small>
+        <button (click)="removeVehicle(v.id)" style="margin-left:8px;">Remove</button>
+      </li>
+    </ul>
+  

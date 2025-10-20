@@ -9,33 +9,7 @@ type RoleKey = 'storage_owner' | 'truck_owner' | 'driver' | 'staff';
   selector: 'app-dashboard-home',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <h2>Overview</h2>
-    <p>Enroll into roles to unlock features. You can be a storage owner, truck owner, driver, or general staff.</p>
-    <div *ngIf="error()" style="color:#b00;">{{ error() }}</div>
-    <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin-top:16px;">
-      <div style="border:1px solid #ddd; border-radius:12px; padding:16px;">
-        <h3>Storage Owner</h3>
-        <p>Create and manage storage units, invite staff.</p>
-        <button (click)="toggle('storage_owner')">{{ roles().storage_owner ? 'Unenroll' : 'Enroll' }}</button>
-      </div>
-      <div style="border:1px solid #ddd; border-radius:12px; padding:16px;">
-        <h3>Truck Owner</h3>
-        <p>Add trucks and hire drivers.</p>
-        <button (click)="toggle('truck_owner')">{{ roles().truck_owner ? 'Unenroll' : 'Enroll' }}</button>
-      </div>
-      <div style="border:1px solid #ddd; border-radius:12px; padding:16px;">
-        <h3>Driver</h3>
-        <p>Work as a driver with your truck or for others.</p>
-        <button (click)="toggle('driver')">{{ roles().driver ? 'Unenroll' : 'Enroll' }}</button>
-      </div>
-      <div style="border:1px solid #ddd; border-radius:12px; padding:16px;">
-        <h3>General Staff</h3>
-        <p>Get invited by a storage owner to help manage units.</p>
-        <button (click)="toggle('staff')">{{ roles().staff ? 'Unenroll' : 'Enroll' }}</button>
-      </div>
-    </div>
-  `
+  templateUrl: './dashboard-home.component.html'
 })
 export class DashboardHomeComponent {
   private http = inject(HttpClient);
@@ -64,4 +38,5 @@ export class DashboardHomeComponent {
     } catch (e: any) { this.error.set(e?.error?.message || 'Failed to update'); }
   }
 }
+
 

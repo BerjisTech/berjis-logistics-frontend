@@ -1,0 +1,20 @@
+<div style="font-family: Inter, Arial, sans-serif; padding: 32px; max-width: 1000px; margin: 0 auto;">
+  <ng-container *ngIf="store() as s; else notFound">
+    <h1 style="margin-top:0;">{{ s.name }}</h1>
+    <div *ngIf="s.description" style="color:#555; margin-bottom:16px;">{{ s.description }}</div>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+      <div *ngFor="let p of products()" style="border:1px solid #eee; border-radius:10px; padding:12px;">
+        <div style="font-weight:600; margin-bottom:6px;">{{ p.name }}</div>
+        <div *ngIf="p.sku" style="color:#777;">SKU: {{ p.sku }}</div>
+        <div style="margin-top:8px;">
+          <span *ngIf="p.priceOverride != null; else basePrice">{{ p.priceOverride }} {{ p.currency || '' }}</span>
+          <ng-template #basePrice>{{ p.price || '-' }} {{ p.currency || '' }}</ng-template>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #notFound>
+    <h2>Store not found</h2>
+    <p>The store you are looking for does not exist or is inactive.</p>
+  </ng-template>
+</div>
