@@ -10,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class DriverJobsPageComponent {
   private http = inject(HttpClient);
-  base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'http://localhost:8081';
+  base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'https://logistics-api.berjis.tech';
   posted = signal<any[]>([]);
   mine = signal<any[]>([]);
 

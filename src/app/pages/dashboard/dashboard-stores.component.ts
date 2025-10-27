@@ -12,7 +12,7 @@ import { RouterModule } from '@angular/router';
 })
 export class DashboardStoresComponent {
   private http = inject(HttpClient);
-  base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'http://localhost:8081';
+  base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'https://logistics-api.berjis.tech';
   stores = signal<any[]>([]);
   message = '';
   constructor(){ this.reload(); }

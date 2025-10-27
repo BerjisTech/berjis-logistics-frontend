@@ -16,12 +16,12 @@
       </div>
       <div style="display:flex; gap:6px; align-items:center;">
         <span style="min-width:72px; opacity:.9;">Logistics</span>
-        <input [value]="apiBase()" (input)="onBase($event)" placeholder="http://localhost:8081" style="padding:4px 6px; border-radius:6px; border:none; outline:none; flex:1;" />
+        <input [value]="apiBase()" (input)="onBase($event)" placeholder="https://logistics-api.berjis.tech" style="padding:4px 6px; border-radius:6px; border:none; outline:none; flex:1;" />
         <button (click)="saveBase()" style="background:#0a4; color:#fff; border:none; border-radius:6px; padding:4px 8px; cursor:pointer;">Apply</button>
       </div>
       <div style="display:flex; gap:6px; align-items:center;">
         <span style="min-width:72px; opacity:.9;">Core API</span>
-        <input [value]="coreBase()" (input)="onCore($event)" placeholder="http://api.berjis.test" style="padding:4px 6px; border-radius:6px; border:none; outline:none; flex:1;" />
+        <input [value]="coreBase()" (input)="onCore($event)" placeholder="https://api.berjis.tech" style="padding:4px 6px; border-radius:6px; border:none; outline:none; flex:1;" />
         <button (click)="saveCore()" style="background:#0a4; color:#fff; border:none; border-radius:6px; padding:4px 8px; cursor:pointer;">Apply</button>
       </div>
     </div>

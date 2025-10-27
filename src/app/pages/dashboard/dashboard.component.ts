@@ -15,7 +15,7 @@ type RoleKey = 'storage_owner' | 'truck_owner' | 'driver' | 'staff';
 })
 export class DashboardPageComponent {
   private http = inject(HttpClient);
-  base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'http://localhost:8081';
+  base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'https://logistics-api.berjis.tech';
   // Global Search
   q = signal('');
   searching = signal(false);

@@ -13,7 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 export class StoreManagePageComponent {
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
-  base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'http://localhost:8081';
+  base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'https://logistics-api.berjis.tech';
   storeId = this.route.snapshot.paramMap.get('id') || '';
   store = signal<any | null>(null);
   products = signal<any[]>([]);

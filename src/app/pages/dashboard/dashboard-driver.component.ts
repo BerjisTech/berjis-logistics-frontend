@@ -14,7 +14,7 @@ import { HttpClient } from '@angular/common/http';
 export class DashboardDriverComponent {
   private http = inject(HttpClient);
   driver = signal<any | null>(null);
-  base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'http://localhost:8081';
+  base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'https://logistics-api.berjis.tech';
   constructor(){ this.reload(); }
   reload(){ this.http.get<any>(`${this.base}/v1/drivers/me`).subscribe({ next:r=> this.driver.set(r?.data||null), error:()=> this.driver.set(null) }); }
   apply(ev: Event){ ev.preventDefault(); const f=ev.target as HTMLFormElement; const fullName=(f.elements.namedItem('fullName') as HTMLInputElement).value.trim()||undefined; const licenseNo=(f.elements.namedItem('licenseNo') as HTMLInputElement).value.trim()||undefined; const phone=(f.elements.namedItem('phone') as HTMLInputElement).value.trim()||undefined; this.http.post(`${this.base}/v1/drivers/apply`,{fullName,licenseNo,phone}).subscribe({ next:()=> this.reload() }); }

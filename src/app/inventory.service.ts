@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 
-const base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'http://localhost:8081';
+const base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'https://logistics-api.berjis.tech';
 
 export interface InventoryItem { id: string; warehouseId: string; sku: string; name: string; quantity: number; }
 export interface InventoryInput { sku: string; name: string; quantity: number; }

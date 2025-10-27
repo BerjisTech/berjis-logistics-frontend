@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 // Call Core API directly via hostname (prod-like topology)
-const apiBase = 'http://api.berjis.test';
+const apiBase = 'https://api.berjis.tech';
 
 export interface Me { id: string; email?: string; name?: string }
 

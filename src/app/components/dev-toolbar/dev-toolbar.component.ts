@@ -24,8 +24,8 @@ export class DevToolbarComponent {
       const cur = localStorage.getItem('dev_user_id') || '';
       this.devId.set(cur);
       (window as any).__DEV_USER_ID__ = cur || undefined;
-      const savedLogistics = localStorage.getItem('logistics_api_base') || (window as any).__LOGISTICS_API__ || 'http://localhost:8081';
-      const savedCore = localStorage.getItem('core_api_base') || (window as any).__BERJIS_API__ || 'http://api.berjis.test';
+      const savedLogistics = localStorage.getItem('logistics_api_base') || (window as any).__LOGISTICS_API__ || 'https://logistics-api.berjis.tech';
+      const savedCore = localStorage.getItem('core_api_base') || (window as any).__BERJIS_API__ || 'https://api.berjis.tech';
       this.apiBase.set(savedLogistics);
       this.coreBase.set(savedCore);
       this.ping();
@@ -71,7 +71,7 @@ export class DevToolbarComponent {
 
   async ping() {
     try {
-      const base = this.apiBase() || 'http://localhost:8081';
+      const base = this.apiBase() || 'https://logistics-api.berjis.tech';
       const res = await fetch(base.replace(/\/$/, '') + '/v1/health', { method: 'GET', mode: 'cors' });
       if (res.ok) {
         this.status.set('ok'); this.healthText.set('Connected'); this.healthColor.set('#0a4');
