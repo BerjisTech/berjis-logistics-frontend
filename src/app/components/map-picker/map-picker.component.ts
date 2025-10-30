@@ -16,16 +16,11 @@ export class MapPickerComponent implements AfterViewInit {
   private marker: any;
   private pendingPosition?: { lat: number; lng: number; zoom: number };
   private readonly defaultCenter: [number, number] = [37.9062, 0.0236];
-  private readonly mapboxToken: string | undefined =
-    typeof window !== 'undefined'
-      ? ((window as any).__ENV?.mapboxToken || (window as any).MAPBOX_TOKEN)
-      : undefined;
-  private readonly mapboxStyle: string =
-    typeof window !== 'undefined'
-      ? ((window as any).__ENV?.mapboxStyle || 'mapbox/streets-v12')
-      : 'mapbox/streets-v12';
+  private mapboxToken?: string;
+  private mapboxStyle = 'mapbox/streets-v12';
 
   ngAfterViewInit(): void {
+    this.hydrateMapboxConfig();
     const root: any = typeof window !== 'undefined' ? (window as any) : undefined;
     const mapbox = root?.mapboxgl;
     if (!mapbox || !this.mapboxToken || !this.mapEl?.nativeElement) {
@@ -84,6 +79,18 @@ export class MapPickerComponent implements AfterViewInit {
       this.marker = new this.mapbox.Marker({ color: '#facc15' })
         .setLngLat([lng, lat])
         .addTo(this.map);
+    }
+  }
+
+  private hydrateMapboxConfig(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const globalAny = window as any;
+    const env = globalAny.__ENV || {};
+    this.mapboxToken = env.mapboxToken || globalAny.MAPBOX_TOKEN;
+    if (env.mapboxStyle) {
+      this.mapboxStyle = env.mapboxStyle;
     }
   }
 }
