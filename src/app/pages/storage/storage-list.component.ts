@@ -61,4 +61,15 @@ export class StorageListPageComponent implements AfterViewInit {
       }
     }
   }
+
+  intervalLabel(mode?: string | null): string {
+    switch (mode) {
+      case 'per_hour': return 'per hour';
+      case 'per_day': return 'per day';
+      case 'per_week': return 'per week';
+      case 'per_month': return 'per month';
+      case 'per_year': return 'per year';
+      default: return '';
+    }
+  }
 }

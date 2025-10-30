@@ -13,7 +13,7 @@ export interface PublicWarehouse {
   isMultiUnit: boolean;
   state: string;
   priceAmount?: number;
-  priceUnit?: string;
+  currency?: string;
   pricingMode?: string;
   areaSqm?: number;
   distanceKm?: number;

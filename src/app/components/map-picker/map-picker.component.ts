@@ -10,34 +10,61 @@ import { CommonModule } from '@angular/common';
 export class MapPickerComponent implements AfterViewInit {
   @ViewChild('map', { static: true }) mapEl!: ElementRef<HTMLDivElement>;
   @Output() selected = new EventEmitter<{ lat: number; lng: number }>();
+
   private map: any;
+  private mapbox?: any;
   private marker: any;
-  private pendingPosition?: { lat: number; lng: number; zoom?: number };
+  private pendingPosition?: { lat: number; lng: number; zoom: number };
+  private readonly defaultCenter: [number, number] = [37.9062, 0.0236];
+  private readonly mapboxToken: string | undefined =
+    typeof window !== 'undefined'
+      ? ((window as any).__ENV?.mapboxToken || (window as any).MAPBOX_TOKEN)
+      : undefined;
+  private readonly mapboxStyle: string =
+    typeof window !== 'undefined'
+      ? ((window as any).__ENV?.mapboxStyle || 'mapbox/streets-v12')
+      : 'mapbox/streets-v12';
 
   ngAfterViewInit(): void {
-    // @ts-ignore: Leaflet provided by index.html script include
-    const L = (window as any).L;
-    if (!L) return;
-    this.map = L.map(this.mapEl.nativeElement).setView([0.0236, 37.9062], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap'
-    }).addTo(this.map);
-    this.map.on('click', (e: any) => {
-      const { lat, lng } = e.latlng;
-      this.selected.emit({ lat, lng });
-      if (this.marker) { this.marker.setLatLng([lat, lng]); }
-      else { this.marker = L.marker([lat, lng]).addTo(this.map); }
-    });
-    if (this.pendingPosition) {
-      const { lat, lng, zoom } = this.pendingPosition;
-      this.applyPosition(lat, lng, zoom);
-      this.pendingPosition = undefined;
+    const root: any = typeof window !== 'undefined' ? (window as any) : undefined;
+    const mapbox = root?.mapboxgl;
+    if (!mapbox || !this.mapboxToken || !this.mapEl?.nativeElement) {
+      return;
     }
+    this.mapbox = mapbox;
+    this.mapbox.accessToken = this.mapboxToken;
+    this.map = new this.mapbox.Map({
+      container: this.mapEl.nativeElement,
+      style: `mapbox://styles/${this.mapboxStyle}`,
+      center: this.defaultCenter,
+      zoom: 6
+    });
+    this.map.addControl(new this.mapbox.NavigationControl(), 'top-right');
+    this.map.on('click', (event: any) => {
+      const lngLat = event?.lngLat;
+      if (!lngLat) {
+        return;
+      }
+      const { lng, lat } = lngLat;
+      if (typeof lat !== 'number' || typeof lng !== 'number') {
+        return;
+      }
+      this.applyPosition(lat, lng, this.map.getZoom());
+      this.selected.emit({ lat, lng });
+    });
+    this.map.once('load', () => {
+      if (this.pendingPosition) {
+        const { lat, lng, zoom } = this.pendingPosition;
+        this.pendingPosition = undefined;
+        this.applyPosition(lat, lng, zoom);
+      }
+    });
   }
 
   setPosition(lat: number, lng: number, zoom: number = 12): void {
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || !Number.isFinite(zoom)) {
+      return;
+    }
     if (!this.map) {
       this.pendingPosition = { lat, lng, zoom };
       return;
@@ -46,13 +73,17 @@ export class MapPickerComponent implements AfterViewInit {
   }
 
   private applyPosition(lat: number, lng: number, zoom: number = 12): void {
-    const L = (window as any).L;
-    if (!this.map || !L) return;
-    this.map.setView([lat, lng], zoom);
+    if (!this.map || !this.mapbox) {
+      this.pendingPosition = { lat, lng, zoom };
+      return;
+    }
+    this.map.flyTo({ center: [lng, lat], zoom, essential: true });
     if (this.marker) {
-      this.marker.setLatLng([lat, lng]);
+      this.marker.setLngLat([lng, lat]);
     } else {
-      this.marker = L.marker([lat, lng]).addTo(this.map);
+      this.marker = new this.mapbox.Marker({ color: '#facc15' })
+        .setLngLat([lng, lat])
+        .addTo(this.map);
     }
   }
 }
