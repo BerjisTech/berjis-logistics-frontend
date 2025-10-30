@@ -1,69 +1,343 @@
-<div style="font-family: Inter, Arial, sans-serif; padding: 32px; max-width: 960px; margin: 0 auto;">
-  <h2>Manage Storage</h2>
-  <p>Create storage locations, manage units and staff. Requires login.</p>
-  <form (submit)="onCreateWarehouse($event)">
-    <input placeholder="Name" name="name" required />
-    <input placeholder="Location" name="location" />
-    <input type="number" step="any" placeholder="Lat" name="lat" />
-    <input type="number" step="any" placeholder="Lng" name="lng" />
-    <select name="state">
-      <option value="available">available</option>
-      <option value="occupied">occupied</option>
-      <option value="maintenance">maintenance</option>
-    </select>
-    <label><input type="checkbox" name="isMultiUnit" /> Multi-unit</label>
-    <button type="submit">Create</button>
-  </form>
-  <div style="margin: 8px 0;">
-    <app-map-picker (selected)="onMapSelected($event)"></app-map-picker>
-  </div>
+<div class="min-h-screen bg-slate-900/5 py-16">
+  <div class="mx-auto flex max-w-6xl flex-col gap-10 px-6 lg:flex-row lg:px-12">
+    <!-- Sidebar -->
+    <aside class="w-full max-w-full rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-xl shadow-blue-900/5 backdrop-blur lg:w-[320px]">
+      <div class="flex flex-col gap-6">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-wide text-blue-900">Storage orchestration</p>
+          <h1 class="mt-2 text-2xl font-semibold text-slate-900">Manage storage network</h1>
+          <p class="mt-3 text-sm text-slate-600">
+            Create micro-warehouses, map capacity, invite collaborators, and maintain space availability in real-time.
+          </p>
+        </div>
 
-  <h3>My Warehouses</h3>
-  <ul>
-    <li *ngFor="let w of warehouses" (click)="select(w)" style="cursor:pointer;">
-      <strong>{{w.name}}</strong> <small *ngIf="w['state']">— {{w['state']}}</small>
-    </li>
-  </ul>
+        <form (submit)="onCreateWarehouse($event)" class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">New location</h2>
 
-  <section *ngIf="selected">
-    <h4>Units — {{selected.name}}</h4>
-    <form (submit)="onCreateUnit($event)">
-      <input placeholder="Name" name="name" required />
-      <input type="number" step="any" placeholder="Area (sqm)" name="areaSqm" />
-      <select name="state">
-        <option value="available">available</option>
-        <option value="occupied">occupied</option>
-        <option value="maintenance">maintenance</option>
-      </select>
-      <button type="submit">Add Unit</button>
-    </form>
-    <ul>
-      <li *ngFor="let u of units">{{u.name}} <small>— {{u.state}}</small></li>
-    </ul>
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500" title="Visible name presented to partners and staff.">
+            <span>Name</span>
+            <input class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" placeholder="e.g. Kitui Distribution Hub" name="name" required />
+          </label>
 
-    <h4>Staff</h4>
-    <form (submit)="onInviteStaff($event)">
-      <input placeholder="User ID" name="userId" required />
-      <select name="role">
-        <option value="staff">staff</option>
-        <option value="admin">admin</option>
-        <option value="viewer">viewer</option>
-      </select>
-      <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap:6px; margin:8px 0; font-size: 12px;">
-        <label><input type="checkbox" name="perm_edit_prices" /> Edit prices</label>
-        <label><input type="checkbox" name="perm_edit_availability" /> Edit availability</label>
-        <label><input type="checkbox" name="perm_manage_discounts" /> Manage discounts</label>
-        <label><input type="checkbox" name="perm_manage_inventory" /> Manage inventory</label>
-        <label><input type="checkbox" name="perm_manage_units" /> Manage units</label>
-        <label><input type="checkbox" name="perm_manage_staff" /> Manage staff</label>
+          <div class="relative flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500" title="Search for a city, town, or address. Select a suggestion to auto-fill coordinates.">
+            <span>Location search</span>
+            <input
+              class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30"
+              placeholder="Start typing (e.g. Kitui, Nairobi...)"
+              name="location"
+              autocomplete="off"
+              [(ngModel)]="locationValue"
+              (focus)="onLocationFocus()"
+              (blur)="onLocationBlur()"
+              (input)="onLocationInput($any($event.target).value)" />
+            <div *ngIf="locationLoading" class="absolute left-0 right-0 top-full z-10 rounded-b-xl border border-t-0 border-slate-200 bg-white px-4 py-2 text-xs text-slate-500">
+              Searching…
+            </div>
+            <div *ngIf="!locationLoading && locationOptions.length" class="absolute left-0 right-0 top-full z-20 divide-y divide-slate-100 rounded-b-xl border border-t-0 border-slate-200 bg-white shadow-lg">
+              <button
+                type="button"
+                *ngFor="let option of locationOptions"
+                (click)="selectLocation(option)"
+                class="flex w-full items-start gap-2 px-4 py-2 text-left text-sm text-slate-700 hover:bg-blue-50">
+                {{ option.label }}
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500" title="Latitude in decimal degrees.">
+              <span>Latitude</span>
+              <input class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" type="number" step="any" placeholder="e.g. -1.3733" name="lat" />
+            </label>
+            <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500" title="Longitude in decimal degrees.">
+              <span>Longitude</span>
+              <input class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" type="number" step="any" placeholder="e.g. 37.9972" name="lng" />
+            </label>
+          </div>
+
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500" title="Approximate floor area in square metres.">
+            <span>Area (sqm)</span>
+            <input class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" type="number" step="any" placeholder="Optional" name="areaSqm" />
+          </label>
+
+          <div class="grid gap-2 md:grid-cols-2">
+            <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500" title="Base price for reserving this space.">
+              <span>Price amount</span>
+              <input class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" type="number" step="any" placeholder="0.00" name="priceAmount" />
+            </label>
+            <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500" title="Billing interval for the price amount.">
+              <span>Billing interval</span>
+              <select class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" name="pricingMode">
+                <option value="" selected>Choose interval</option>
+                <option *ngFor="let option of billingIntervals" [value]="option.value">{{ option.label }}</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500" title="Currency used when quoting storage fees.">
+            <span>Currency</span>
+            <select class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" name="currency">
+              <option value="" selected>Choose currency</option>
+              <option *ngFor="let currency of currencies" [value]="currency">{{ currency }}</option>
+            </select>
+          </label>
+
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500" title="Operational state of this storage node.">
+            <span>Status</span>
+            <select class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" name="state">
+              <option value="available">Available</option>
+              <option value="occupied">Occupied</option>
+              <option value="maintenance">Maintenance</option>
+            </select>
+          </label>
+
+          <label class="flex items-center gap-2 text-sm text-slate-600" title="Enable if the warehouse hosts multiple independent rentable units.">
+            <input type="checkbox" name="isMultiUnit" class="h-4 w-4 rounded border-slate-300 text-blue-900 focus:ring-blue-900">
+            Multi-unit location
+          </label>
+
+          <button type="submit" class="mt-2 inline-flex items-center justify-center rounded-xl bg-blue-900 px-4 py-2 text-sm font-semibold text-white shadow shadow-blue-900/30 transition hover:-translate-y-0.5 hover:bg-blue-800">
+            Create warehouse
+          </button>
+        </form>
+
+        <div class="overflow-hidden rounded-2xl border border-slate-200">
+          <app-map-picker (selected)="onMapSelected($event)"></app-map-picker>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-blue-900">My network</h2>
+          <div class="flex flex-col gap-2">
+            <button type="button"
+                    *ngFor="let w of warehouses"
+                    (click)="select(w)"
+                    class="flex flex-col rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-sm transition hover:border-yellow-400 hover:bg-yellow-50"
+                    [class.border-blue-900]="selected?.id === w.id"
+                    [class.bg-blue-50]="selected?.id === w.id">
+              <span class="font-semibold text-slate-900">{{ w.name }}</span>
+              <span class="text-xs text-slate-500" *ngIf="w.location">{{ w.location }}</span>
+              <span class="text-xs text-blue-900 font-semibold" *ngIf="w.state">Status · {{ w.state }}</span>
+            </button>
+          </div>
+        </div>
       </div>
-      <button type="submit">Invite</button>
-    </form>
-    <ul>
-      <li *ngFor="let s of staff">
-        {{s.userId}} — {{s.role}}
-        <small *ngIf="s.permissions"> — perms: {{ s.permissions | json }}</small>
-      </li>
-    </ul>
-  </section>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1">
+      <ng-container *ngIf="selected; else emptyState">
+        <div class="flex flex-col gap-8">
+          <div class="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-xl shadow-slate-900/5 backdrop-blur">
+            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div>
+                <p class="text-sm font-semibold uppercase tracking-wide text-blue-900">Active location</p>
+                <h2 class="text-3xl font-semibold text-slate-900">{{ selected?.name }}</h2>
+                <p class="mt-2 text-sm text-slate-600" *ngIf="selected?.location">{{ selected?.location }}</p>
+              </div>
+              <div class="grid grid-cols-2 gap-3 text-sm text-slate-600 md:text-right">
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p class="text-xs uppercase tracking-wide text-slate-500">Status</p>
+                  <p class="text-sm font-semibold text-slate-900">{{ selected?.state || 'available' }}</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p class="text-xs uppercase tracking-wide text-slate-500">Capacity</p>
+                  <p class="text-sm font-semibold text-slate-900">
+                    <ng-container *ngIf="selected?.areaSqm; else noArea">{{ selected?.areaSqm }} m²</ng-container>
+                    <ng-template #noArea>—</ng-template>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid gap-8 lg:grid-cols-[2fr,1fr]">
+            <div class="flex flex-col gap-8">
+              <!-- Booking calendar -->
+              <section class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-lg shadow-blue-900/5 backdrop-blur">
+                <div class="flex flex-col gap-6">
+                  <div class="flex flex-col gap-2">
+                    <h3 class="text-xl font-semibold text-slate-900">Bookings timeline</h3>
+                    <p class="text-sm text-slate-600">
+                      Visualise reservations, plan capacity, and identify open slots at a glance.
+                    </p>
+                  </div>
+                  <app-booking-calendar [bookings]="bookings"></app-booking-calendar>
+                  <div class="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+                    <h4 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Schedule booking</h4>
+                    <form class="grid gap-3 md:grid-cols-4 md:items-end" (submit)="onCreateBooking($event)">
+                      <label class="flex flex-col text-xs font-semibold uppercase tracking-wide text-slate-400 md:col-span-2">
+                        Start date
+                        <input type="date" name="startDate" required class="mt-1 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30">
+                      </label>
+                      <label class="flex flex-col text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        End date
+                        <input type="date" name="endDate" class="mt-1 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30">
+                      </label>
+                      <label class="flex flex-col text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Space (m²)
+                        <input type="number" step="any" name="spaceReserved" class="mt-1 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30">
+                      </label>
+                      <button type="submit" class="md:col-span-4 inline-flex items-center justify-center rounded-xl bg-yellow-400 px-4 py-2 text-sm font-semibold text-slate-900 shadow shadow-yellow-400/30 transition hover:-translate-y-0.5 hover:bg-yellow-300">
+                        Reserve slot
+                      </button>
+                    </form>
+                  </div>
+                  <div class="flex items-center justify-between text-xs text-slate-500">
+                    <span *ngIf="bookingsLoading">Loading bookings…</span>
+                    <span *ngIf="!bookingsLoading && !bookings.length">No active bookings yet.</span>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Units -->
+              <section class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-lg shadow-slate-900/5 backdrop-blur">
+                <div class="flex flex-col gap-4">
+                  <div class="flex flex-col gap-1">
+                    <h3 class="text-xl font-semibold text-slate-900">Warehouse units</h3>
+                    <p class="text-sm text-slate-600">Track availability and expand modular capacity within the site.</p>
+                  </div>
+                  <form class="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 md:grid-cols-4 md:items-end" (submit)="onCreateUnit($event)">
+                    <label class="md:col-span-2 flex flex-col text-xs font-semibold uppercase tracking-wide text-slate-400">
+                      Unit name
+                      <input placeholder="Cold storage bay" name="name" required class="mt-1 rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" />
+                    </label>
+                    <label class="flex flex-col text-xs font-semibold uppercase tracking-wide text-slate-400">
+                      Area (sqm)
+                      <input type="number" step="any" placeholder="120" name="areaSqm" class="mt-1 rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" />
+                    </label>
+                    <label class="flex flex-col text-xs font-semibold uppercase tracking-wide text-slate-400">
+                      State
+                      <select name="state" class="mt-1 rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30">
+                        <option value="available">Available</option>
+                        <option value="occupied">Occupied</option>
+                        <option value="maintenance">Maintenance</option>
+                      </select>
+                    </label>
+                    <button type="submit" class="md:col-span-4 inline-flex items-center justify-center rounded-xl bg-blue-900 px-4 py-2 text-sm font-semibold text-white shadow shadow-blue-900/30 transition hover:-translate-y-0.5 hover:bg-blue-800">
+                      Add unit
+                    </button>
+                  </form>
+                  <div class="grid gap-3 md:grid-cols-2">
+                    <div *ngFor="let u of units" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                      <p class="font-semibold text-slate-900">{{ u.name }}</p>
+                      <p class="text-xs text-slate-500">State · {{ u.state }}</p>
+                      <p class="text-xs text-slate-500" *ngIf="u.areaSqm">Area · {{ u.areaSqm }} m²</p>
+                    </div>
+                    <p *ngIf="!units.length" class="rounded-2xl border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-500">
+                      No units defined yet. Create granular sections to maximise capacity control.
+                    </p>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <!-- Staff & bookings list -->
+            <div class="flex flex-col gap-8">
+              <section class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-lg shadow-slate-900/5 backdrop-blur">
+                <div class="flex flex-col gap-4">
+                  <div class="flex flex-col gap-1">
+                    <h3 class="text-xl font-semibold text-slate-900">Team & collaborators</h3>
+                    <p class="text-sm text-slate-600">Grant granular permissions to staff, partners, or customers.</p>
+                  </div>
+                  <form class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4" (submit)="onInviteStaff($event)">
+                    <div class="grid gap-3 md:grid-cols-2">
+                      <label class="flex flex-col text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        User ID (UUID)
+                        <input placeholder="user-uuid" name="userId" required class="mt-1 rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" />
+                      </label>
+                      <label class="flex flex-col text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        Role
+                        <select name="role" class="mt-1 rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30">
+                          <option value="staff">Staff</option>
+                          <option value="admin">Admin</option>
+                          <option value="viewer">Viewer</option>
+                        </select>
+                      </label>
+                    </div>
+                    <div class="grid gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400 md:grid-cols-2">
+                      <label class="flex items-center gap-2 text-slate-600">
+                        <input type="checkbox" name="perm_edit_prices" class="h-4 w-4 rounded border-slate-300 text-blue-900 focus:ring-blue-900">
+                        Edit prices
+                      </label>
+                      <label class="flex items-center gap-2 text-slate-600">
+                        <input type="checkbox" name="perm_edit_availability" class="h-4 w-4 rounded border-slate-300 text-blue-900 focus:ring-blue-900">
+                        Edit availability
+                      </label>
+                      <label class="flex items-center gap-2 text-slate-600">
+                        <input type="checkbox" name="perm_manage_discounts" class="h-4 w-4 rounded border-slate-300 text-blue-900 focus:ring-blue-900">
+                        Manage discounts
+                      </label>
+                      <label class="flex items-center gap-2 text-slate-600">
+                        <input type="checkbox" name="perm_manage_inventory" class="h-4 w-4 rounded border-slate-300 text-blue-900 focus:ring-blue-900">
+                        Manage inventory
+                      </label>
+                      <label class="flex items-center gap-2 text-slate-600">
+                        <input type="checkbox" name="perm_manage_units" class="h-4 w-4 rounded border-slate-300 text-blue-900 focus:ring-blue-900">
+                        Manage units
+                      </label>
+                      <label class="flex items-center gap-2 text-slate-600">
+                        <input type="checkbox" name="perm_manage_staff" class="h-4 w-4 rounded border-slate-300 text-blue-900 focus:ring-blue-900">
+                        Manage staff
+                      </label>
+                    </div>
+                    <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-blue-900 px-4 py-2 text-sm font-semibold text-white shadow shadow-blue-900/30 transition hover:-translate-y-0.5 hover:bg-blue-800">
+                      Invite collaborator
+                    </button>
+                  </form>
+
+                  <div class="flex flex-col gap-3">
+                    <div *ngFor="let s of staff" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                      <p class="font-semibold text-slate-900">{{ s.userId }}</p>
+                      <p class="text-xs text-blue-900">Role · {{ s.role }}</p>
+                      <p class="text-xs text-slate-500" *ngIf="s.permissions">Permissions · {{ s.permissions | json }}</p>
+                    </div>
+                    <p *ngIf="!staff.length" class="rounded-2xl border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-500">
+                      No team members added yet.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-lg shadow-slate-900/5 backdrop-blur">
+                <div class="flex flex-col gap-4">
+                  <div>
+                    <h3 class="text-xl font-semibold text-slate-900">Upcoming bookings</h3>
+                    <p class="text-sm text-slate-600">Manage reservations and release space when plans change.</p>
+                  </div>
+                  <div class="flex flex-col gap-3">
+                    <div *ngFor="let b of bookings" class="flex flex-col gap-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                      <div class="flex items-center justify-between">
+                        <div class="font-semibold text-slate-900">
+                          {{ b.startDate }} <span *ngIf="b.endDate">→ {{ b.endDate }}</span>
+                        </div>
+                        <span class="text-xs font-semibold uppercase tracking-wide text-blue-900">{{ b.status }}</span>
+                      </div>
+                      <p class="text-xs text-slate-500">Tenant · {{ b.tenantUserId }}</p>
+                      <p class="text-xs text-slate-500" *ngIf="b.spaceReserved">Space · {{ b.spaceReserved }} m²</p>
+                      <button type="button" class="self-start text-xs font-semibold text-yellow-600 transition hover:text-yellow-500" (click)="onCancelBooking(b.id)">
+                        Cancel booking
+                      </button>
+                    </div>
+                    <p *ngIf="!bookings.length" class="rounded-2xl border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-500">
+                      No bookings for this month yet. Reserve slots above to fill capacity.
+                    </p>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #emptyState>
+        <div class="flex h-full min-h-[400px] flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-slate-300 bg-white/80 p-12 text-center shadow-inner">
+          <h2 class="text-2xl font-semibold text-slate-900">Select a warehouse to get started</h2>
+          <p class="max-w-md text-sm text-slate-600">
+            Create your first location or choose an existing one to unlock inventory controls, booking calendar, and collaboration tools.
+          </p>
+        </div>
+      </ng-template>
+    </main>
+  </div>
 </div>
+

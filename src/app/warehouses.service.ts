@@ -3,8 +3,31 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 const base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'https://logistics-api.berjis.tech';
 
-export interface Warehouse { id: string; name: string; location: string; }
-export interface CreateWarehouse { name: string; location?: string; }
+export interface Warehouse {
+  id: string;
+  name: string;
+  location?: string;
+  state?: string;
+  lat?: number;
+  lng?: number;
+  isMultiUnit?: boolean;
+  priceAmount?: number;
+  currency?: string;
+  pricingMode?: string;
+  areaSqm?: number;
+}
+export interface CreateWarehouse {
+  name: string;
+  location?: string;
+  state?: string;
+  lat?: number;
+  lng?: number;
+  isMultiUnit?: boolean;
+  priceAmount?: number;
+  currency?: string;
+  pricingMode?: string;
+  areaSqm?: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class WarehousesService {

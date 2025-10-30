@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 
+const base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'https://logistics-api.berjis.tech';
+
 @Component({
   selector: 'app-public-tracking',
   standalone: true,
@@ -21,7 +23,8 @@ export class PublicTrackingPageComponent {
     this.error = null; this.result = null; this.loading = true;
     const code = (this.code || '').trim();
     if (!code) { this.loading = false; this.error = 'Enter a tracking code'; return; }
-    this.http.get(`/v1/public/track/${encodeURIComponent(code)}`).subscribe({
+    const url = `${base.replace(/\/$/, '')}/v1/public/track/${encodeURIComponent(code)}`;
+    this.http.get(url).subscribe({
       next: (res: any) => { this.result = res?.data || res; this.loading = false; },
       error: (err) => { this.error = err?.error?.message || 'Not found'; this.loading = false; }
     });

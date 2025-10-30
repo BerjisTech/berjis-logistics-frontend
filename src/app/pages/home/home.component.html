@@ -1,26 +1,148 @@
-<div style="font-family: Inter, Arial, sans-serif; padding: 32px; max-width: 960px; margin: 0 auto;">
-  <h1>Berjis Logistics</h1>
-  <p style="color:#444; max-width: 720px;">Plan, store and move goods efficiently. Logistics brings together storage units, fleet, manufacturers, suppliers and order fulfillment in one place.</p>
-  <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-top:16px;">
-    <a routerLink="/storage" style="border:1px solid #ddd; border-radius:12px; padding:16px; display:block; text-decoration:none; color:inherit;">
-      <h3>Storage</h3>
-      <p>Find and manage warehouses and storage units.</p>
-    </a>
-    <a routerLink="/transport" style="border:1px solid #ddd; border-radius:12px; padding:16px; display:block; text-decoration:none; color:inherit;">
-      <h3>Transport</h3>
-      <p>Browse transport options by kind and capacity.</p>
-    </a>
-    <a routerLink="/products" style="border:1px solid #ddd; border-radius:12px; padding:16px; display:block; text-decoration:none; color:inherit;">
-      <h3>Products</h3>
-      <p>Discover products across warehouses.</p>
-    </a>
-    <div style="border:1px solid #ddd; border-radius:12px; padding:16px;">
-      <h3>Orders</h3>
-      <p>Create, assign and track orders and shipments.</p>
+<div class="min-h-screen bg-slate-950 text-slate-100">
+  <!-- Hero -->
+  <section class="relative isolate overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-blue-900">
+    <div class="absolute inset-0 opacity-40" style="background: radial-gradient(circle at top right, rgba(234,179,8,0.35), transparent 60%)"></div>
+    <div class="relative mx-auto flex max-w-6xl flex-col gap-16 px-6 py-24 lg:px-12">
+      <div class="max-w-3xl">
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-1 text-sm font-semibold uppercase tracking-wide text-yellow-400">
+          Berjis Logistics Platform
+        </span>
+        <h1 class="mt-6 text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
+          The distributed logistics grid for storage, mobility, and commerce.
+        </h1>
+        <p class="mt-6 text-lg text-slate-200">
+          Connect underutilised space, flexible transport, and intelligent fulfilment into a unified control tower.
+          Build resilient supply chains, unlock new revenue, and give customers real-time visibility end-to-end.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-4">
+          <a routerLink="/dashboard" class="inline-flex items-center rounded-full bg-yellow-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-yellow-400/30 transition hover:-translate-y-0.5 hover:bg-yellow-300">
+            Launch Control Tower
+          </a>
+          <a routerLink="/storage" class="inline-flex items-center rounded-full border border-white/30 px-6 py-3 text-base font-semibold text-white transition hover:border-yellow-400 hover:text-yellow-300">
+            Explore Network
+          </a>
+        </div>
+      </div>
+      <div class="grid gap-6 md:grid-cols-3">
+        <div *ngFor="let stat of heroHighlights" class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <p class="text-sm uppercase tracking-wide text-slate-300">{{ stat.label }}</p>
+          <p class="mt-3 text-3xl font-semibold text-yellow-300">{{ stat.value }}</p>
+          <p class="mt-3 text-sm text-slate-200">{{ stat.detail }}</p>
+        </div>
+      </div>
     </div>
-      <a routerLink="/track" style="border:1px solid #ddd; border-radius:12px; padding:16px; display:block; text-decoration:none; color:inherit;">
-      <h3>Track Shipment</h3>
-      <p>Track a delivery by its public code.</p>
-    </a></div>
-</div>
+  </section>
 
+  <!-- Capabilities -->
+  <section class="bg-white py-24 text-slate-900">
+    <div class="mx-auto flex max-w-6xl flex-col gap-12 px-6 lg:px-12">
+      <div class="max-w-3xl">
+        <h2 class="text-3xl font-semibold text-slate-900 sm:text-4xl">Decentralised infrastructure built for modern commerce</h2>
+        <p class="mt-4 text-lg text-slate-600">
+          Deploy the pieces you need—from micro-warehousing to elastic fleets and curated marketplaces.
+          Every capability interlocks to shorten lead times, reduce congestion, and deliver a premium customer experience.
+        </p>
+      </div>
+      <div class="grid gap-8 md:grid-cols-2">
+        <div *ngFor="let capability of capabilities" class="group h-full rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:border-yellow-400 hover:shadow-xl">
+          <div class="flex h-full flex-col gap-4">
+            <div class="inline-flex items-center gap-2 text-sm font-semibold text-blue-900">
+              <span class="h-2 w-2 rounded-full bg-yellow-400"></span>
+              Strategic capability
+            </div>
+            <h3 class="text-2xl font-semibold text-slate-900">{{ capability.title }}</h3>
+            <p class="text-slate-600">{{ capability.description }}</p>
+            <a *ngIf="capability.link" [routerLink]="capability.link" class="mt-auto inline-flex items-center text-sm font-semibold text-blue-900 transition hover:text-yellow-500">
+              Dive deeper →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature Grid -->
+  <section class="bg-slate-900 py-24">
+    <div class="mx-auto flex max-w-6xl flex-col gap-12 px-6 text-slate-100 lg:px-12">
+      <div class="max-w-3xl">
+        <h2 class="text-3xl font-semibold text-white sm:text-4xl">Intelligence at every layer</h2>
+        <p class="mt-4 text-lg text-slate-300">
+          Move beyond siloed tools. Berjis Logistics synchronises operations, data, and finance with
+          powerful automation designed for high-velocity supply chains.
+        </p>
+      </div>
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <article *ngFor="let feature of features" class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur transition hover:border-yellow-300/70 hover:bg-white/10">
+          <div class="text-3xl">{{ feature.icon }}</div>
+          <h3 class="mt-4 text-xl font-semibold text-white">{{ feature.title }}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-200">{{ feature.description }}</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Workflow -->
+  <section class="bg-white py-24 text-slate-900">
+    <div class="mx-auto flex max-w-6xl flex-col gap-12 px-6 lg:px-12">
+      <div class="flex flex-col gap-4">
+        <h2 class="text-3xl font-semibold text-slate-900 sm:text-4xl">From onboarding to optimisation in four moves</h2>
+        <p class="max-w-3xl text-lg text-slate-600">
+          Whether you’re spinning up a new corridor or augmenting existing operations, our launch framework
+          keeps teams aligned and value flowing from day one.
+        </p>
+      </div>
+      <ol class="grid gap-6 md:grid-cols-2">
+        <li *ngFor="let step of workflow; let idx = index" class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <span class="absolute -top-5 left-6 inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 to-yellow-500 text-lg font-semibold text-slate-900 shadow-lg shadow-yellow-500/30">
+            {{ idx + 1 }}
+          </span>
+          <div class="mt-4">
+            <h3 class="text-xl font-semibold text-slate-900">{{ step.title }}</h3>
+            <p class="mt-3 text-sm leading-relaxed text-slate-600">{{ step.description }}</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Audiences -->
+  <section class="bg-slate-950 py-24">
+    <div class="mx-auto flex max-w-6xl flex-col gap-12 px-6 text-slate-100 lg:px-12">
+      <div class="max-w-3xl">
+        <h2 class="text-3xl font-semibold text-white sm:text-4xl">Designed for every logistics stakeholder</h2>
+        <p class="mt-4 text-lg text-slate-300">
+          Unlock new revenue streams, reduce risk, and create delightful experiences—no matter your role in the ecosystem.
+        </p>
+      </div>
+      <div class="grid gap-6 md:grid-cols-2">
+        <div *ngFor="let audience of audiences" class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur transition hover:border-yellow-300/60 hover:bg-white/10">
+          <h3 class="text-xl font-semibold text-yellow-300">{{ audience.title }}</h3>
+          <p class="mt-3 text-sm leading-relaxed text-slate-100">{{ audience.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="bg-white py-24 text-slate-900">
+    <div class="mx-auto flex max-w-4xl flex-col items-center gap-8 px-6 text-center lg:px-12">
+      <span class="inline-flex items-center gap-2 rounded-full border border-yellow-400 px-4 py-1 text-sm font-semibold text-yellow-600">
+        Ready to build the future of logistics?
+      </span>
+      <h2 class="max-w-3xl text-3xl font-semibold sm:text-4xl">
+        Activate Berjis Logistics and reimagine how goods are stored, moved, and sold.
+      </h2>
+      <p class="max-w-2xl text-lg text-slate-600">
+        Get started with a network walkthrough, connect your inventory, or invite your first partners. We’ll guide you through each step.
+      </p>
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a routerLink="/dashboard" class="inline-flex items-center rounded-full bg-blue-900 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-blue-900/30 transition hover:-translate-y-0.5 hover:bg-blue-800">
+          Launch Dashboard
+        </a>
+        <a routerLink="/track" class="inline-flex items-center rounded-full border border-slate-900 px-6 py-3 text-base font-semibold text-slate-900 transition hover:border-yellow-400 hover:text-yellow-500">
+          Share Tracking Demo
+        </a>
+      </div>
+    </div>
+  </section>
+</div>

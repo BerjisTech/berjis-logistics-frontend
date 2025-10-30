@@ -25,24 +25,34 @@ import { PublicTrackingPageComponent } from './app/pages/public-tracking/public-
 
 import { DashboardStoresComponent } from './app/pages/dashboard/dashboard-stores.component';
 import { StoreManagePageComponent } from './app/pages/dashboard/store-manage.component';
+import { ShipmentsCenterComponent } from './app/pages/shipments/shipments-center.component';
+import { TrackingDemoPageComponent } from './app/pages/tracking/tracking-demo.component';
+import { FinanceCenterComponent } from './app/pages/finance/finance-center.component';
+import { MarketingCenterComponent } from './app/pages/marketing/marketing-center.component';
 
 const routes: Routes = [
   { path: '', component: HomePageComponent },
-  { path: 'dashboard', component: DashboardPageComponent, canActivate: [authGuard], children: [
-    
-    { path: 'stores', component: DashboardStoresComponent },
-    { path: 'stores/:id/manage', component: StoreManagePageComponent },
-    { path: 'storage', component: DashboardStorageComponent },
-    { path: 'fleet', component: DashboardFleetComponent },
-    { path: 'products', component: DashboardProductsComponent },
-    { path: 'crm', component: DashboardCrmComponent },
-    { path: 'driver', component: DashboardDriverComponent },
-   ] },
+  {
+    path: 'dashboard', component: DashboardPageComponent, canActivate: [authGuard], children: [
+
+      { path: 'stores', component: DashboardStoresComponent },
+      { path: 'stores/:id/manage', component: StoreManagePageComponent },
+      { path: 'storage', component: DashboardStorageComponent },
+      { path: 'fleet', component: DashboardFleetComponent },
+      { path: 'products', component: DashboardProductsComponent },
+      { path: 'crm', component: DashboardCrmComponent },
+      { path: 'driver', component: DashboardDriverComponent },
+    ]
+  },
   { path: 'driver-jobs', component: DriverJobsPageComponent, canActivate: [authGuard] },
   { path: 'storage', component: StorageListPageComponent },
   { path: 'products', component: ProductsListPageComponent },
   { path: 'transport', component: TransportListPageComponent },
   { path: 'track', component: PublicTrackingPageComponent },
+  { path: 'shipments', component: ShipmentsCenterComponent, canActivate: [authGuard] },
+  { path: 'finance', component: FinanceCenterComponent, canActivate: [authGuard] },
+  { path: 'marketing', component: MarketingCenterComponent, canActivate: [authGuard] },
+  { path: 'tracking-demo', component: TrackingDemoPageComponent, canActivate: [authGuard] },
   { path: 'store/:slug', component: StoreLandingPageComponent },
   { path: 'storage/manage', component: StorageManagePageComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
@@ -54,9 +64,6 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes)
   ]
 }).catch(err => console.error(err));
-
-
-
 
 
 

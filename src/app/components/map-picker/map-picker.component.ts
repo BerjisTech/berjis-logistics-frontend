@@ -12,6 +12,8 @@ export class MapPickerComponent implements AfterViewInit {
   @Output() selected = new EventEmitter<{ lat: number; lng: number }>();
   private map: any;
   private marker: any;
+  private pendingPosition?: { lat: number; lng: number; zoom?: number };
+
   ngAfterViewInit(): void {
     // @ts-ignore: Leaflet provided by index.html script include
     const L = (window as any).L;
@@ -27,6 +29,30 @@ export class MapPickerComponent implements AfterViewInit {
       if (this.marker) { this.marker.setLatLng([lat, lng]); }
       else { this.marker = L.marker([lat, lng]).addTo(this.map); }
     });
+    if (this.pendingPosition) {
+      const { lat, lng, zoom } = this.pendingPosition;
+      this.applyPosition(lat, lng, zoom);
+      this.pendingPosition = undefined;
+    }
+  }
+
+  setPosition(lat: number, lng: number, zoom: number = 12): void {
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    if (!this.map) {
+      this.pendingPosition = { lat, lng, zoom };
+      return;
+    }
+    this.applyPosition(lat, lng, zoom);
+  }
+
+  private applyPosition(lat: number, lng: number, zoom: number = 12): void {
+    const L = (window as any).L;
+    if (!this.map || !L) return;
+    this.map.setView([lat, lng], zoom);
+    if (this.marker) {
+      this.marker.setLatLng([lat, lng]);
+    } else {
+      this.marker = L.marker([lat, lng]).addTo(this.map);
+    }
   }
 }
-
