@@ -19,7 +19,7 @@ export class DashboardProductsComponent {
   myWarehouses = signal<Warehouse[]>([]);
   inventory = signal<InventoryItem[]>([]);
   selectedWarehouseId = signal<string>('');
-  constructor(){ this.core.verify().subscribe({ next:(r:any)=>{ this.userId = r?.data?.uid?.toString(); this.refreshWarehouses(); }, error:()=> this.refreshWarehouses() }); }
+  constructor(){ this.core.verify().subscribe({ next:(r:any)=>{ this.userId = this.core.userIdFrom(r); this.refreshWarehouses(); }, error:()=> this.refreshWarehouses() }); }
   refreshWarehouses(){ this.wh.list(this.userId).subscribe({ next:r=> { const rows=r.data||[]; this.myWarehouses.set(rows); if (!this.selectedWarehouseId() && rows.length) { this.selectedWarehouseId.set(rows[0].id); this.refreshInventory(); } }, error:()=> { this.myWarehouses.set([]); this.inventory.set([]); } }); }
   onSelect(id: string){ this.selectedWarehouseId.set(id); this.refreshInventory(); }
   refreshInventory(){ const wid=this.selectedWarehouseId(); if (!wid) { this.inventory.set([]); return; } this.inv.list(wid, this.userId).subscribe({ next:r=> this.inventory.set(r.data||[]), error:()=> this.inventory.set([]) }); }

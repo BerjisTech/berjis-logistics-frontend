@@ -42,19 +42,19 @@ const routes: Routes = [
       { path: 'products', component: DashboardProductsComponent },
       { path: 'crm', component: DashboardCrmComponent },
       { path: 'driver', component: DashboardDriverComponent },
+      { path: 'shipments', component: ShipmentsCenterComponent },
+      { path: 'finance', component: FinanceCenterComponent },
+      { path: 'marketing', component: MarketingCenterComponent },
+      { path: 'storage/manage', component: StorageManagePageComponent },
     ]
   },
   { path: 'driver-jobs', component: DriverJobsPageComponent, canActivate: [authGuard] },
+  { path: 'tracking-demo', component: TrackingDemoPageComponent, canActivate: [authGuard] },
   { path: 'storage', component: StorageListPageComponent },
   { path: 'products', component: ProductsListPageComponent },
   { path: 'transport', component: TransportListPageComponent },
   { path: 'track', component: PublicTrackingPageComponent },
-  { path: 'shipments', component: ShipmentsCenterComponent, canActivate: [authGuard] },
-  { path: 'finance', component: FinanceCenterComponent, canActivate: [authGuard] },
-  { path: 'marketing', component: MarketingCenterComponent, canActivate: [authGuard] },
-  { path: 'tracking-demo', component: TrackingDemoPageComponent, canActivate: [authGuard] },
   { path: 'store/:slug', component: StoreLandingPageComponent },
-  { path: 'storage/manage', component: StorageManagePageComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];
 

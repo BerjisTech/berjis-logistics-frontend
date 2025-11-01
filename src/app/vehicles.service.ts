@@ -10,20 +10,19 @@ export interface VehicleInput { plate: string; kind?: string; capacityKg?: numbe
 export class VehiclesService {
   constructor(private http: HttpClient) {}
   list(userId?: string) {
-    const headers = userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
     return this.http.get<{success:boolean; data: Vehicle[]}>(`${base}/v1/vehicles`, { headers });
   }
   create(input: VehicleInput, userId?: string) {
-    const headers = userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
     return this.http.post<{success:boolean; data: Vehicle}>(`${base}/v1/vehicles`, input, { headers });
   }
   update(id: string, input: Partial<VehicleInput>, userId?: string) {
-    const headers = userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
     return this.http.put<{success:boolean; data: Vehicle}>(`${base}/v1/vehicles/${id}`, input, { headers });
   }
   remove(id: string, userId?: string) {
-    const headers = userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
     return this.http.delete<{success:boolean}>(`${base}/v1/vehicles/${id}`, { headers });
   }
 }
-

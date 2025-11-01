@@ -74,7 +74,7 @@ export class FinanceService {
   constructor(private http: HttpClient) {}
 
   private headers(userId?: string): HttpHeaders | undefined {
-    return userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    return userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
   }
 
   listInvoices(params: { status?: string; q?: string; limit?: number; offset?: number } = {}, userId?: string) {

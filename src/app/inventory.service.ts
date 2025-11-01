@@ -10,19 +10,19 @@ export interface InventoryInput { sku: string; name: string; quantity: number; }
 export class InventoryService {
   constructor(private http: HttpClient) {}
   list(warehouseId: string, userId?: string) {
-    const headers = userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
     return this.http.get<{success:boolean; data: InventoryItem[]}>(`${base}/v1/warehouses/${warehouseId}/inventory`, { headers });
   }
   create(warehouseId: string, input: InventoryInput, userId?: string) {
-    const headers = userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
     return this.http.post<{success:boolean; data: InventoryItem}>(`${base}/v1/warehouses/${warehouseId}/inventory`, input, { headers });
   }
   update(warehouseId: string, id: string, input: InventoryInput, userId?: string) {
-    const headers = userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
     return this.http.put<{success:boolean; data: InventoryItem}>(`${base}/v1/warehouses/${warehouseId}/inventory/${id}`, input, { headers });
   }
   remove(warehouseId: string, id: string, userId?: string) {
-    const headers = userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
     return this.http.delete<{success:boolean}>(`${base}/v1/warehouses/${warehouseId}/inventory/${id}`, { headers });
   }
 }

@@ -21,9 +21,13 @@ export class DevToolbarComponent {
       // Only show in dev hosts
       const host = (typeof window !== 'undefined') ? window.location.hostname : '';
       this.show = host === 'localhost' || host === '127.0.0.1';
-      const cur = localStorage.getItem('dev_user_id') || '';
-      this.devId.set(cur);
-      (window as any).__DEV_USER_ID__ = cur || undefined;
+      const stored = localStorage.getItem('dev_user_uuid') ?? localStorage.getItem('dev_user_id') ?? '';
+      this.devId.set(stored);
+      if (stored) {
+        localStorage.setItem('dev_user_uuid', stored);
+      }
+      (window as any).__DEV_USER_UUID__ = stored || undefined;
+      (window as any).__DEV_USER_ID__ = stored || undefined;
       const savedLogistics = localStorage.getItem('logistics_api_base') || (window as any).__LOGISTICS_API__ || 'https://logistics-api.berjis.tech';
       const savedCore = localStorage.getItem('core_api_base') || (window as any).__BERJIS_API__ || 'https://api.berjis.tech';
       this.apiBase.set(savedLogistics);
@@ -37,14 +41,22 @@ export class DevToolbarComponent {
   save() {
     try {
       const v = this.devId();
-      if (v) localStorage.setItem('dev_user_id', v); else localStorage.removeItem('dev_user_id');
+      if (v) {
+        localStorage.setItem('dev_user_uuid', v);
+      } else {
+        localStorage.removeItem('dev_user_uuid');
+      }
+      localStorage.removeItem('dev_user_id');
+      (window as any).__DEV_USER_UUID__ = v || undefined;
       (window as any).__DEV_USER_ID__ = v || undefined;
     } catch {}
   }
   clear() {
     try {
       this.devId.set('');
+      localStorage.removeItem('dev_user_uuid');
       localStorage.removeItem('dev_user_id');
+      (window as any).__DEV_USER_UUID__ = undefined;
       (window as any).__DEV_USER_ID__ = undefined;
     } catch {}
   }
@@ -83,4 +95,3 @@ export class DevToolbarComponent {
     }
   }
 }
-

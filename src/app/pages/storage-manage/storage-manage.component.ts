@@ -44,9 +44,18 @@ export class StorageManagePageComponent {
   private readonly mapboxToken: string | undefined = typeof window !== 'undefined'
     ? ((window as any).__ENV?.mapboxToken || (window as any).MAPBOX_TOKEN)
     : undefined;
+  private readonly apiBase: string = (() => {
+    if (typeof window === 'undefined') {
+      return 'https://logistics-api.berjis.tech';
+    }
+    const configured = (window as any).__LOGISTICS_API__;
+    const fallback = 'https://logistics-api.berjis.tech';
+    const base = (typeof configured === 'string' && configured.trim().length > 0) ? configured.trim() : fallback;
+    return base.replace(/\/+$/, '');
+  })();
 
   constructor() {
-    this.core.verify().subscribe({ next: (r: any) => { this.userId = r?.data?.uid?.toString(); this.refreshWarehouses(); }, error: () => { this.refreshWarehouses(); } });
+    this.core.verify().subscribe({ next: (r: any) => { this.userId = this.core.userIdFrom(r); this.refreshWarehouses(); }, error: () => { this.refreshWarehouses(); } });
   }
 
   refreshWarehouses() {
@@ -104,25 +113,41 @@ export class StorageManagePageComponent {
 
   select(w: Warehouse) {
     this.selected = w;
-    this.refreshUnits();
-    this.refreshStaff();
+    void this.refreshUnits();
+    void this.refreshStaff();
     this.refreshBookings();
   }
 
-  onCreateUnit(ev: Event) {
-    ev.preventDefault(); if (!this.selected) return; const f = ev.target as HTMLFormElement;
+  async onCreateUnit(ev: Event) {
+    ev.preventDefault();
+    if (!this.selected) return;
+    const f = ev.target as HTMLFormElement;
     const name = (f.elements.namedItem('name') as HTMLInputElement).value.trim();
     const areaRaw = (f.elements.namedItem('areaSqm') as HTMLInputElement).value;
     const state = (f.elements.namedItem('state') as HTMLSelectElement).value || 'available';
     const area = areaRaw ? parseFloat(areaRaw) : undefined;
-    fetch(`/v1/warehouses/${this.selected.id}/units`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(this.userId ? {'X-User-ID': this.userId} : {}) }, body: JSON.stringify({ name, areaSqm: area, state }) })
-      .then(() => this.refreshUnits());
+    if (!name) return;
+    try {
+      const res = await fetch(`${this.apiBase}/v1/warehouses/${this.selected.id}/units`, {
+        method: 'POST',
+        headers: this.apiHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ name, areaSqm: area, state })
+      });
+      if (!res.ok) {
+        return;
+      }
+      f.reset();
+      await this.refreshUnits();
+    } catch {}
   }
 
-  onInviteStaff(ev: Event) {
-    ev.preventDefault(); if (!this.selected) return; const f = ev.target as HTMLFormElement;
+  async onInviteStaff(ev: Event) {
+    ev.preventDefault();
+    if (!this.selected) return;
+    const f = ev.target as HTMLFormElement;
     const uid = (f.elements.namedItem('userId') as HTMLInputElement).value.trim();
     const role = (f.elements.namedItem('role') as HTMLSelectElement).value || 'staff';
+    if (!uid) return;
     const permissions = {
       edit_prices: (f.elements.namedItem('perm_edit_prices') as HTMLInputElement)?.checked || false,
       edit_availability: (f.elements.namedItem('perm_edit_availability') as HTMLInputElement)?.checked || false,
@@ -131,12 +156,51 @@ export class StorageManagePageComponent {
       manage_units: (f.elements.namedItem('perm_manage_units') as HTMLInputElement)?.checked || false,
       manage_staff: (f.elements.namedItem('perm_manage_staff') as HTMLInputElement)?.checked || false,
     };
-    fetch(`/v1/warehouses/${this.selected.id}/staff`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(this.userId ? {'X-User-ID': this.userId} : {}) }, body: JSON.stringify({ userId: uid, role, permissions }) })
-      .then(() => this.refreshStaff());
+    try {
+      const res = await fetch(`${this.apiBase}/v1/warehouses/${this.selected.id}/staff`, {
+        method: 'POST',
+        headers: this.apiHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ userId: uid, role, permissions })
+      });
+      if (!res.ok) {
+        return;
+      }
+      await this.refreshStaff();
+    } catch {}
   }
 
-  refreshUnits() { if (!this.selected) return; fetch(`/v1/warehouses/${this.selected.id}/units`, { headers: this.userId ? {'X-User-ID': this.userId} : {} }).then(r => r.json()).then(r => this.units = r?.data || []); }
-  refreshStaff() { if (!this.selected) return; fetch(`/v1/warehouses/${this.selected.id}/staff`, { headers: this.userId ? {'X-User-ID': this.userId} : {} }).then(r => r.json()).then(r => this.staff = r?.data || []); }
+  async refreshUnits() {
+    if (!this.selected) return;
+    try {
+      const res = await fetch(`${this.apiBase}/v1/warehouses/${this.selected.id}/units`, {
+        headers: this.apiHeaders()
+      });
+      if (!res.ok) {
+        this.units = [];
+        return;
+      }
+      const json = await res.json().catch(() => null);
+      this.units = json?.data || [];
+    } catch {
+      this.units = [];
+    }
+  }
+  async refreshStaff() {
+    if (!this.selected) return;
+    try {
+      const res = await fetch(`${this.apiBase}/v1/warehouses/${this.selected.id}/staff`, {
+        headers: this.apiHeaders()
+      });
+      if (!res.ok) {
+        this.staff = [];
+        return;
+      }
+      const json = await res.json().catch(() => null);
+      this.staff = json?.data || [];
+    } catch {
+      this.staff = [];
+    }
+  }
 
   refreshBookings() {
     if (!this.selected) { this.bookings = []; return; }
@@ -234,6 +298,14 @@ export class StorageManagePageComponent {
         this.locationOptions = [];
         this.locationLoading = false;
       });
+  }
+
+  private apiHeaders(extra: Record<string, string> = {}): Record<string, string> {
+    const headers: Record<string, string> = { ...extra };
+    if (this.userId) {
+      headers['X-User-UUID'] = this.userId;
+    }
+    return headers;
   }
 
   private syncLatLngInputs() {

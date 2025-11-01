@@ -32,7 +32,7 @@ export class MarketingCenterComponent {
   constructor() {
     this.core.verify().subscribe({
       next: (res: any) => {
-        this.userId = res?.data?.uid?.toString();
+        this.userId = this.core.userIdFrom(res);
         this.loadCampaigns();
       },
       error: () => this.loadCampaigns()

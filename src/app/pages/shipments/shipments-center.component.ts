@@ -43,7 +43,7 @@ export class ShipmentsCenterComponent implements AfterViewInit {
   constructor() {
     this.coreApi.verify().subscribe({
       next: (res: any) => {
-        this.userId = res?.data?.uid?.toString();
+        this.userId = this.coreApi.userIdFrom(res);
         this.loadShipments();
         this.loadSummary();
       },

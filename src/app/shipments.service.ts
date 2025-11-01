@@ -85,6 +85,6 @@ export class ShipmentsService {
   }
 
   private headers(userId?: string): HttpHeaders | undefined {
-    return userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    return userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
   }
 }

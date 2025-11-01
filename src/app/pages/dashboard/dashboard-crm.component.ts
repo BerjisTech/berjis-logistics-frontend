@@ -17,7 +17,7 @@ export class DashboardCrmComponent {
   suppliers: Contact[] = [];
   wholesalers: Contact[] = [];
   userId?: string;
-  constructor(){ this.core.verify().subscribe({ next:(r:any)=>{ this.userId=r?.data?.uid?.toString(); this.refreshAll(); }, error:()=> this.refreshAll() }); }
+  constructor(){ this.core.verify().subscribe({ next:(r:any)=>{ this.userId=this.core.userIdFrom(r); this.refreshAll(); }, error:()=> this.refreshAll() }); }
   refreshAll(){
     this.api.list(this.userId,'client').subscribe({ next:r=> this.clients = r.data||[] });
     this.api.list(this.userId,'supplier').subscribe({ next:r=> this.suppliers = r.data||[] });

@@ -23,21 +23,20 @@ export interface ContactInput {
 export class ContactsService {
   constructor(private http: HttpClient) {}
   list(userId?: string, kind?: string) {
-    let headers = userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    let headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
     let params = new HttpParams(); if (kind) params = params.set('kind', kind);
     return this.http.get<{success:boolean; data: Contact[]}>(`${base}/v1/contacts`, { headers, params });
   }
   create(input: ContactInput, userId?: string) {
-    const headers = userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
     return this.http.post<{success:boolean; data: Contact}>(`${base}/v1/contacts`, input, { headers });
   }
   update(id: string, input: Partial<ContactInput>, userId?: string) {
-    const headers = userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
     return this.http.put<{success:boolean; data: Contact}>(`${base}/v1/contacts/${id}`, input, { headers });
   }
   remove(id: string, userId?: string) {
-    const headers = userId ? new HttpHeaders({ 'X-User-ID': userId }) : undefined;
+    const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
     return this.http.delete<{success:boolean}>(`${base}/v1/contacts/${id}`, { headers });
   }
 }
-
