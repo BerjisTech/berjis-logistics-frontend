@@ -15,6 +15,7 @@ export interface Warehouse {
   currency?: string;
   pricingMode?: string;
   areaSqm?: number;
+  images?: string[];
 }
 export interface CreateWarehouse {
   name: string;
@@ -27,6 +28,7 @@ export interface CreateWarehouse {
   currency?: string;
   pricingMode?: string;
   areaSqm?: number;
+  images?: string[];
 }
 
 @Injectable({ providedIn: 'root' })

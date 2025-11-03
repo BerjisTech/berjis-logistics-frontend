@@ -3,8 +3,8 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 const base = (typeof window !== 'undefined' && (window as any).__LOGISTICS_API__) || 'https://logistics-api.berjis.tech';
 
-export interface Vehicle { id: string; plate: string; kind?: string; capacityKg?: number }
-export interface VehicleInput { plate: string; kind?: string; capacityKg?: number }
+export interface Vehicle { id: string; plate: string; kind?: string; capacityKg?: number; images?: string[] }
+export interface VehicleInput { plate: string; kind?: string; capacityKg?: number; images?: string[] }
 
 @Injectable({ providedIn: 'root' })
 export class VehiclesService {
@@ -12,6 +12,10 @@ export class VehiclesService {
   list(userId?: string) {
     const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
     return this.http.get<{success:boolean; data: Vehicle[]}>(`${base}/v1/vehicles`, { headers });
+  }
+  get(id: string, userId?: string) {
+    const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;
+    return this.http.get<{success:boolean; data: Vehicle}>(`${base}/v1/vehicles/${id}`, { headers });
   }
   create(input: VehicleInput, userId?: string) {
     const headers = userId ? new HttpHeaders({ 'X-User-UUID': userId }) : undefined;

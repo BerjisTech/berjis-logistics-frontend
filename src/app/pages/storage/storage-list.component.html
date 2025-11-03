@@ -1,36 +1,47 @@
-<div style="font-family: Inter, Arial, sans-serif; padding: 32px; max-width: 1200px; margin: 0 auto;">
-  <h2>Find Storage</h2>
-  <p>Search warehouses by location or name. Booking requires an account; managing requires ownership.</p>
-  <form (submit)="$event.preventDefault(); search();" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
-    <input [(ngModel)]="q" name="q" placeholder="Search by name (optional)" style="flex:1; min-width:240px; padding:8px; border:1px solid #ddd; border-radius:8px;" />
-    <input [(ngModel)]="near" name="near" placeholder="lat,lng (optional)" style="width:200px; padding:8px; border:1px solid #ddd; border-radius:8px;" />
-    <input type="number" [(ngModel)]="radiusKm" name="radius" placeholder="radius km" style="width:120px; padding:8px; border:1px solid #ddd; border-radius:8px;" />
-    <button type="button" (click)="geolocate()" style="padding:8px 12px;">Use my location</button>
-    <button type="submit" style="padding:8px 12px;">Search</button>
-  </form>
+<div class="fixed inset-0 flex h-screen w-screen flex-col bg-slate-50/70">
+  <!-- Header / Search -->
+  <header class="z-10 border-b border-slate-200 bg-white/90 px-4 py-3 shadow-sm backdrop-blur md:px-6">
+    <div class="mx-auto flex max-w-7xl items-center gap-3">
+      <h2 class="mr-2 shrink-0 text-lg font-semibold text-slate-900">Find Storage</h2>
+      <form (submit)="$event.preventDefault(); search();" class="flex w-full items-center gap-2">
+        <input [(ngModel)]="q" name="q" placeholder="Search by name" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" />
+        <input [(ngModel)]="near" name="near" placeholder="lat,lng" class="w-[200px] rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" />
+        <input type="number" [(ngModel)]="radiusKm" name="radius" placeholder="km" class="w-[100px] rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-900/30" />
+        <button type="button" (click)="geolocate()" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-blue-900 shadow-sm transition hover:bg-blue-50">Use my location</button>
+        <button type="submit" class="rounded-xl bg-blue-900 px-4 py-2 text-sm font-semibold text-white shadow shadow-blue-900/30 transition hover:-translate-y-0.5 hover:bg-blue-800">Search</button>
+      </form>
+    </div>
+  </header>
 
-  <div #map class="map" style="margin-bottom:12px;"></div>
+  <!-- Body: two-column grid and map -->
+  <div class="relative grid h-full flex-1 grid-cols-1 md:grid-cols-[360px_1fr]">
+    <!-- Left: scrollable list -->
+    <aside class="z-10 order-2 h-full overflow-y-auto border-t border-slate-200 bg-white/80 p-3 md:order-1 md:border-t-0 md:border-r">
+      <ul class="mx-auto flex max-w-[320px] flex-col gap-3">
+        <li *ngFor="let w of warehouses" [attr.data-id]="w.id" [class]="activeId===w.id ? 'ring-2 ring-yellow-400/60' : ''" class="group w-[300px] cursor-pointer rounded-2xl border border-slate-200 bg-white p-3 shadow-sm shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-md" (click)="focusWarehouse(w)" (mouseenter)="hoverWarehouse(w)" (mouseleave)="hoverWarehouse(undefined)">
+          <div class="flex flex-col gap-2">
+            <div class="text-sm font-semibold text-slate-900">{{ w.name }}</div>
+            <div class="text-xs text-slate-600">
+              <span *ngIf="w.location">{{ w.location }}</span>
+              <span *ngIf="w.state"> · {{ w.state | titlecase }}</span>
+              <span *ngIf="w.distanceKm"> · {{ w.distanceKm | number:'1.0-1' }} km</span>
+            </div>
+            <div class="text-xs text-slate-900" *ngIf="w.priceAmount != null">
+              {{ w.priceAmount | number:'1.2-2' }} {{ w.currency || '' }}
+              <span *ngIf="intervalLabel(w.pricingMode)"> · {{ intervalLabel(w.pricingMode) }}</span>
+            </div>
+            <div class="text-xs text-slate-500" *ngIf="w.priceAmount == null">Pricing on request</div>
+            <div class="text-xs text-slate-500" *ngIf="w.areaSqm">{{ w.areaSqm }} sqm</div>
+            <!-- Optional carousel if images are present -->
+            <app-image-carousel *ngIf="w.images?.length" [images]="w.images!" class="mt-1"></app-image-carousel>
+          </div>
+        </li>
+      </ul>
+    </aside>
 
-  <ul style="display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none;">
-    <li *ngFor="let w of warehouses" style="padding: 14px 18px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);">
-      <div style="display: flex; flex-direction: column; gap: 6px;">
-        <div style="font-size: 16px; font-weight: 600; color: #0f172a;">{{ w.name }}</div>
-        <div style="font-size: 13px; color: #475569;">
-          <span *ngIf="w.location">{{ w.location }}</span>
-          <span *ngIf="w.state"> | {{ w.state | titlecase }}</span>
-          <span *ngIf="w.distanceKm"> | {{ w.distanceKm | number:'1.0-1' }} km away</span>
-        </div>
-        <div style="font-size: 13px; color: #0f172a;" *ngIf="w.priceAmount != null">
-          {{ w.priceAmount | number:'1.2-2' }} {{ w.currency || '' }}
-          <span *ngIf="intervalLabel(w.pricingMode)"> | {{ intervalLabel(w.pricingMode) }}</span>
-        </div>
-        <div style="font-size: 13px; color: #94a3b8;" *ngIf="w.priceAmount == null">
-          Pricing available on request
-        </div>
-        <div style="font-size: 12px; color: #64748b;" *ngIf="w.areaSqm">
-          {{ w.areaSqm }} sqm total capacity
-        </div>
-      </div>
-    </li>
-  </ul>
+    <!-- Right: map fills remaining space -->
+    <section class="order-1 h-full w-full md:order-2">
+      <div #map class="h-full w-full"></div>
+    </section>
+  </div>
 </div>

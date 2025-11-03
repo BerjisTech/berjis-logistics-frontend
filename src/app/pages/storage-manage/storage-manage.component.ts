@@ -1,9 +1,11 @@
 import { Component, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { WarehousesService, Warehouse } from '../../warehouses.service';
 import { InventoryService } from '../../inventory.service';
 import { ApiService } from '../../api.service';
+import { UploadService } from '../../upload.service';
 import { MapPickerComponent } from '../../components/map-picker/map-picker.component';
 import { BookingCalendarComponent } from '../../components/booking-calendar/booking-calendar.component';
 import { BookingsService, Booking } from '../../bookings.service';
@@ -20,6 +22,8 @@ export class StorageManagePageComponent {
   private inv = inject(InventoryService);
   private bookingsApi = inject(BookingsService);
   private core = inject(ApiService);
+  private uploads = inject(UploadService);
+  private route = inject(ActivatedRoute);
   readonly currencies = ['USD', 'EUR', 'GBP', 'KES', 'NGN', 'ZAR', 'INR'];
   readonly billingIntervals = [
     { value: 'per_hour', label: 'Per hour' },
@@ -31,6 +35,10 @@ export class StorageManagePageComponent {
   warehouses: Warehouse[] = [];
   selected: Warehouse | null = null;
   units: any[] = [];
+  editingUnitId: string | null = null;
+  editUnitName = '';
+  editUnitArea?: number;
+  editUnitState: string = 'available';
   staff: any[] = [];
   bookings: Booking[] = [];
   userId: string | undefined;
@@ -41,6 +49,14 @@ export class StorageManagePageComponent {
   locationLoading = false;
   private locationTimer?: any;
   private locationHideTimer?: any;
+  private imagesToUpload: File[] = [];
+  // warehouse edit state
+  editingWarehouse = false;
+  editWhName = '';
+  editWhState: string = 'available';
+  editWhArea?: number;
+  editWhIsMultiUnit = false;
+  private imagesToUploadMore: File[] = [];
   private readonly mapboxToken: string | undefined = typeof window !== 'undefined'
     ? ((window as any).__ENV?.mapboxToken || (window as any).MAPBOX_TOKEN)
     : undefined;
@@ -62,9 +78,10 @@ export class StorageManagePageComponent {
     this.wh.list(this.userId).subscribe({
       next: r => {
         this.warehouses = r.data;
-        if (this.warehouses.length && !this.selected) {
-          this.select(this.warehouses[0]);
-        }
+        const qp = this.route.snapshot?.queryParamMap;
+        const wanted = qp?.get('id') || qp?.get('select') || '';
+        const pick = this.warehouses.find(w => w.id === wanted) || (!this.selected ? this.warehouses[0] : null);
+        if (pick) this.select(pick);
       },
       error: () => { this.warehouses = []; this.selected = null; this.units = []; this.staff = []; this.bookings = []; }
     });
@@ -73,6 +90,18 @@ export class StorageManagePageComponent {
   onMapSelected(p: {lat:number; lng:number}) {
     this.lat = p.lat; this.lng = p.lng;
     this.syncLatLngInputs();
+  }
+
+  onImagesSelected(ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const files = input.files ? Array.from(input.files) : [];
+    this.imagesToUpload = files.filter(f => f.type.startsWith('image/'));
+  }
+
+  onImagesSelectedMore(ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const files = input.files ? Array.from(input.files) : [];
+    this.imagesToUploadMore = files.filter(f => f.type.startsWith('image/'));
   }
 
   onCreateWarehouse(ev: Event) {
@@ -86,6 +115,7 @@ export class StorageManagePageComponent {
     const pricingMode = (f.elements.namedItem('pricingMode') as HTMLSelectElement)?.value || undefined;
     const areaSqmRaw = (f.elements.namedItem('areaSqm') as HTMLInputElement)?.value;
     if (!name) return;
+    if (this.imagesToUpload.length < 5) { alert('Please upload at least 5 images.'); return; }
     const payload: any = {
       name,
       location,
@@ -98,21 +128,31 @@ export class StorageManagePageComponent {
       pricingMode,
       areaSqm: areaSqmRaw ? parseFloat(areaSqmRaw) : undefined
     };
-    this.wh.create(payload, this.userId)
-      .subscribe({
-        next: () => {
-          f.reset();
-          this.lat = undefined; this.lng = undefined;
-          this.locationValue = '';
-          this.locationOptions = [];
-          this.refreshWarehouses();
-        },
-        error: () => {}
-      });
+    this.uploads.uploadImages(this.imagesToUpload, this.userId).subscribe({
+      next: (res) => {
+        const urls = res.data?.urls || [];
+        if (urls.length < 5) { alert('Upload failed: need at least 5 valid images.'); return; }
+        payload.images = urls;
+        this.wh.create(payload, this.userId)
+          .subscribe({
+            next: () => {
+              f.reset();
+              this.imagesToUpload = [];
+              this.lat = undefined; this.lng = undefined;
+              this.locationValue = '';
+              this.locationOptions = [];
+              this.refreshWarehouses();
+            },
+            error: () => {}
+          });
+      },
+      error: () => { alert('Upload failed. Please try again.'); }
+    });
   }
 
   select(w: Warehouse) {
     this.selected = w;
+    this.editingWarehouse = false;
     void this.refreshUnits();
     void this.refreshStaff();
     this.refreshBookings();
@@ -185,6 +225,36 @@ export class StorageManagePageComponent {
       this.units = [];
     }
   }
+
+  startEditUnit(u: any) {
+    this.editingUnitId = u.id;
+    this.editUnitName = u.name || '';
+    this.editUnitArea = u.areaSqm != null ? Number(u.areaSqm) : undefined;
+    this.editUnitState = u.state || 'available';
+  }
+
+  cancelEditUnit() {
+    this.editingUnitId = null;
+    this.editUnitName = '';
+    this.editUnitArea = undefined;
+    this.editUnitState = 'available';
+  }
+
+  async saveUnit(u: any) {
+    if (!this.selected || !this.editingUnitId) return;
+    try {
+      const body: any = { name: this.editUnitName, state: this.editUnitState };
+      if (this.editUnitArea != null && !Number.isNaN(this.editUnitArea)) body.areaSqm = this.editUnitArea;
+      const res = await fetch(`${this.apiBase}/v1/warehouses/${this.selected.id}/units/${encodeURIComponent(this.editingUnitId)}`, {
+        method: 'PUT',
+        headers: this.apiHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) return;
+      this.cancelEditUnit();
+      await this.refreshUnits();
+    } catch {}
+  }
   async refreshStaff() {
     if (!this.selected) return;
     try {
@@ -199,6 +269,47 @@ export class StorageManagePageComponent {
       this.staff = json?.data || [];
     } catch {
       this.staff = [];
+    }
+  }
+
+  // Warehouse edit controls
+  beginEditWarehouse() {
+    if (!this.selected) return;
+    const w = this.selected;
+    this.editWhName = w.name || '';
+    this.editWhState = (w.state as any) || 'available';
+    this.editWhArea = w.areaSqm != null ? Number(w.areaSqm) : undefined;
+    this.editWhIsMultiUnit = !!w.isMultiUnit;
+    this.locationValue = w.location || '';
+    this.lat = w.lat;
+    this.lng = w.lng;
+    this.editingWarehouse = true;
+  }
+  cancelEditWarehouse() {
+    this.editingWarehouse = false;
+    this.imagesToUploadMore = [];
+  }
+  saveEditWarehouse() {
+    if (!this.selected) return;
+    const id = this.selected.id;
+    const payload: any = {
+      name: this.editWhName,
+      state: this.editWhState,
+      areaSqm: this.editWhArea,
+      isMultiUnit: this.editWhIsMultiUnit,
+      location: this.locationValue,
+      lat: this.lat,
+      lng: this.lng,
+    };
+    const finish = () => { this.editingWarehouse = false; this.refreshWarehouses(); };
+    const doUpdate = (images?: string[]) => {
+      if (images && images.length) payload.images = images;
+      this.wh.update(id, payload, this.userId).subscribe({ next: finish, error: () => {} });
+    };
+    if (this.imagesToUploadMore.length) {
+      this.uploads.uploadImages(this.imagesToUploadMore, this.userId).subscribe({ next: (r)=> doUpdate(r.data?.urls||[]), error: ()=> doUpdate() });
+    } else {
+      doUpdate();
     }
   }
 

@@ -46,6 +46,8 @@ const routes: Routes = [
       { path: 'finance', component: FinanceCenterComponent },
       { path: 'marketing', component: MarketingCenterComponent },
       { path: 'storage/manage', component: StorageManagePageComponent },
+      { path: 'fleet/new', loadComponent: () => import('./app/pages/transport/vehicle-editor.component').then(m => m.VehicleEditorComponent) },
+      { path: 'fleet/vehicle/:id', loadComponent: () => import('./app/pages/transport/vehicle-editor.component').then(m => m.VehicleEditorComponent) },
     ]
   },
   { path: 'driver-jobs', component: DriverJobsPageComponent, canActivate: [authGuard] },
@@ -64,7 +66,6 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes)
   ]
 }).catch(err => console.error(err));
-
 
 
 

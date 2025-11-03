@@ -1,17 +1,33 @@
 
     <h2>Fleet</h2>
-    <form (submit)="addVehicle($event)" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
-      <input name="plate" placeholder="Plate (e.g., KAA 123A)" required style="padding:8px; border:1px solid #ddd; border-radius:8px;" />
-      <input name="kind" placeholder="Kind (truck, van, bike)" style="padding:8px; border:1px solid #ddd; border-radius:8px;" />
-      <input name="capacityKg" type="number" placeholder="Capacity (kg)" style="padding:8px; border:1px solid #ddd; border-radius:8px; width:160px;" />
-      <button type="submit">Add Vehicle</button>
+    <form (submit)="addVehicle($event)" class="mb-3 flex flex-col gap-2 rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+      <div class="flex flex-wrap items-center gap-2">
+        <input name="plate" placeholder="Plate (e.g., KAA 123A)" required class="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+        <input name="kind" placeholder="Kind (truck, van, bike)" class="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+        <input name="capacityKg" type="number" placeholder="Capacity (kg)" class="w-[160px] rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+      </div>
+      <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <span>Images (upload at least 5)</span>
+        <input type="file" multiple accept="image/*" (change)="onImagesSelected($event)" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-blue-900 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-800" />
+      </label>
+      <div>
+        <button type="submit" class="rounded-xl bg-blue-900 px-4 py-2 text-sm font-semibold text-white shadow shadow-blue-900/30 transition hover:-translate-y-0.5 hover:bg-blue-800">Add Vehicle</button>
+      </div>
     </form>
-    <ul>
-      <li *ngFor="let v of vehicles">
-        <strong>{{v.plate}}</strong>
-        <small *ngIf="v.kind"> — {{v.kind}}</small>
-        <small *ngIf="v.capacityKg"> — {{v.capacityKg | number:'1.0-0'}} kg</small>
-        <button (click)="removeVehicle(v.id)" style="margin-left:8px;">Remove</button>
+    <div class="mb-2 flex items-center justify-between">
+      <a routerLink="/dashboard/fleet/new" class="inline-flex items-center rounded-xl bg-blue-900 px-3 py-1.5 text-sm font-semibold text-white shadow shadow-blue-900/30 transition hover:-translate-y-0.5 hover:bg-blue-800">New Vehicle</a>
+    </div>
+    <ul class="flex flex-col gap-2">
+      <li *ngFor="let v of vehicles" class="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+        <div class="flex items-center justify-between">
+          <div class="text-sm font-semibold text-slate-900">{{v.plate}} <span class="text-slate-500" *ngIf="v.kind">· {{v.kind}}</span></div>
+          <div class="text-xs text-blue-900" *ngIf="v.capacityKg">{{v.capacityKg | number:'1.0-0'}} kg</div>
+        </div>
+        <app-image-carousel *ngIf="v.images?.length" [images]="v.images" class="mt-2"></app-image-carousel>
+        <div class="mt-2 flex items-center gap-3">
+          <a [routerLink]="['/dashboard/fleet/vehicle', v.id]" class="text-xs font-semibold text-blue-900 hover:text-blue-800">Edit</a>
+          <button (click)="removeVehicle(v.id)" class="text-xs font-semibold text-yellow-600 hover:text-yellow-500">Remove</button>
+        </div>
       </li>
     </ul>
   

@@ -1,0 +1,43 @@
+<div class="min-h-screen bg-slate-50/70 px-4 py-6 md:px-6">
+  <div class="mx-auto max-w-3xl">
+    <h2 class="text-xl font-semibold text-slate-900">{{ id ? 'Edit Vehicle' : 'New Vehicle' }}</h2>
+    <p class="text-sm text-slate-600 mb-4">High-quality images increase trust and conversions.</p>
+
+    <form (submit)="$event.preventDefault(); save();" class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
+      <div class="grid gap-2 md:grid-cols-3">
+        <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <span>Plate</span>
+          <input [(ngModel)]="plate" name="plate" required class="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+        </label>
+        <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <span>Kind</span>
+          <input [(ngModel)]="kind" name="kind" class="rounded-xl border border-slate-200 px-3 py-2 text-sm" placeholder="truck, van, bike" />
+        </label>
+        <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <span>Capacity (kg)</span>
+          <input [(ngModel)]="capacityKg" name="capacityKg" type="number" class="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+        </label>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-semibold uppercase tracking-wide text-slate-500">Images</label>
+        <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
+          <div *ngFor="let url of images(); let i = index" class="group relative overflow-hidden rounded-xl border border-slate-200 bg-slate-100"
+               draggable="true" (dragstart)="onDragStart($event,i)" (dragover)="onDragOver($event)" (drop)="onDrop($event,i)">
+            <img [src]="url" class="h-32 w-full object-cover" />
+            <button type="button" (click)="removeImage(i)" class="absolute right-1 top-1 hidden rounded bg-slate-900/70 px-2 py-1 text-[11px] font-semibold text-white group-hover:block">Remove</button>
+          </div>
+        </div>
+        <div class="rounded-xl border border-dashed border-slate-300 p-4 text-center">
+          <input type="file" accept="image/*" multiple (change)="onFilePick($event)" class="inline-block" />
+          <p class="mt-1 text-[11px] text-slate-500">Drag to reorder. Upload 5+ images for best results.</p>
+        </div>
+      </div>
+
+      <div class="mt-2">
+        <button [disabled]="loading" class="rounded-xl bg-blue-900 px-4 py-2 text-sm font-semibold text-white shadow shadow-blue-900/30 transition hover:-translate-y-0.5 hover:bg-blue-800">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
