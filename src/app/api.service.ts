@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom, tap } from 'rxjs';
 
 // Call Core API directly via hostname (prod-like topology)
@@ -11,11 +11,27 @@ export interface Me { id: string; email?: string; name?: string }
 export class ApiService {
   me: Me | null = null;
   constructor(private http: HttpClient) {}
+  private authHeaders(): HttpHeaders {
+    let h = new HttpHeaders();
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (token) h = h.set('Authorization', `Bearer ${token}`);
+    } catch {}
+    return h;
+  }
   verify() {
-    return this.http.get<any>(`${apiBase}/v1/auth/verify`, { withCredentials: true })
+    return this.http.get<any>(`${apiBase}/v1/auth/verify`, { withCredentials: true, headers: this.authHeaders() })
       .pipe(tap(res => this.syncUser(res?.data)));
   }
-  refresh() { return this.http.post<any>(`${apiBase}/v1/auth/refresh`, {}, { withCredentials: true }); }
+  refresh() {
+    return this.http.post<any>(`${apiBase}/v1/auth/refresh`, {}, { withCredentials: true, headers: this.authHeaders() })
+      .pipe(tap((res: any) => {
+        try {
+          const token = res?.data?.access || res?.access;
+          if (typeof token === 'string' && token.length) localStorage.setItem('accessToken', token);
+        } catch {}
+      }));
+  }
   async ensureAuth(): Promise<any> {
     try {
       const v = await firstValueFrom(this.verify());

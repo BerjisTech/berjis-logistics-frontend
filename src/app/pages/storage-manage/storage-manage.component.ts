@@ -174,6 +174,9 @@ export class StorageManagePageComponent {
         body: JSON.stringify({ name, areaSqm: area, state })
       });
       if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        const msg = (err && err.message) ? String(err.message) : 'Could not create unit';
+        alert(msg);
         return;
       }
       f.reset();
@@ -203,6 +206,9 @@ export class StorageManagePageComponent {
         body: JSON.stringify({ userId: uid, role, permissions })
       });
       if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        const msg = (err && err.message) ? String(err.message) : 'Could not add staff member';
+        alert(msg);
         return;
       }
       await this.refreshStaff();
@@ -250,7 +256,12 @@ export class StorageManagePageComponent {
         headers: this.apiHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(body)
       });
-      if (!res.ok) return;
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        const msg = (err && err.message) ? String(err.message) : 'Could not save unit changes';
+        alert(msg);
+        return;
+      }
       this.cancelEditUnit();
       await this.refreshUnits();
     } catch {}
