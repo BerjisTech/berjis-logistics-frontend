@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DevToolbarComponent } from './components/dev-toolbar/dev-toolbar.component';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,11 @@ import { DevToolbarComponent } from './components/dev-toolbar/dev-toolbar.compon
 })
 export class AppComponent implements OnInit {
   isDark = false;
+  private auth = inject(CoreAuthService);
+  environment = environment;
   ngOnInit(): void {
+    // Warm up auth like landing does
+    this.auth.ensureAuth().catch(()=>{});
     const persisted = (localStorage.getItem('theme') || '').toLowerCase();
     const preferDark = persisted === 'dark';
     this.setTheme(preferDark ? 'dark' : 'light');
@@ -23,3 +28,4 @@ export class AppComponent implements OnInit {
     try { localStorage.setItem('theme', mode); } catch {}
   }
 }
+import { CoreAuthService } from './core/auth.service';

@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { CoreAuthService } from '../../core/auth.service';
 
 interface Highlight {
   label: string;
@@ -37,6 +38,26 @@ interface Audience {
   templateUrl: './home.component.html'
 })
 export class HomePageComponent {
+  private api = inject(CoreAuthService);
+  readonly isAuthed = signal<boolean>(false);
+  constructor() { this.bootstrapAuthState(); }
+
+  private async bootstrapAuthState() {
+    try {
+      const res = await this.api.ensureAuth();
+      this.isAuthed.set(!!res?.data?.valid);
+    } catch { this.isAuthed.set(false); }
+  }
+
+  loginUrl(): string {
+    if (typeof window === 'undefined') return 'https://berjis.tech/auth/login';
+    const host = window.location.hostname;
+    const m = host.match(/(^|\.)berjis\.(test|tech|com)$/i);
+    const root = m ? `berjis.${m[2].toLowerCase()}` : 'berjis.tech';
+    const origin = window.location.origin;
+    const target = `${window.location.protocol}//${root}/auth/login?returnUrl=${encodeURIComponent(origin + '/dashboard')}`;
+    return target;
+  }
   readonly heroHighlights: Highlight[] = [
     { label: 'Storage Nodes', value: '7,200+', detail: 'Active micro-warehousing locations across the network.' },
     { label: 'Drivers & Fleets', value: '18,500+', detail: 'Independent and enterprise drivers ready to move cargo.' },

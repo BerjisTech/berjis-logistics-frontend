@@ -5,6 +5,9 @@ import { devUserInterceptor } from './app/dev-user.interceptor';
 import { errorsInterceptor } from './app/errors.interceptor';
 import { authTokenInterceptor } from './app/auth-token.interceptor';
 import { provideRouter, Routes } from '@angular/router';
+import { APP_INITIALIZER } from '@angular/core';
+import { CoreAuthService } from './app/core/auth.service';
+import { authInitFactory } from './app/auth.init';
 import { HomePageComponent } from './app/pages/home/home.component';
 import { StorageListPageComponent } from './app/pages/storage/storage-list.component';
 import { StorageManagePageComponent } from './app/pages/storage-manage/storage-manage.component';
@@ -31,6 +34,7 @@ import { ShipmentsCenterComponent } from './app/pages/shipments/shipments-center
 import { TrackingDemoPageComponent } from './app/pages/tracking/tracking-demo.component';
 import { FinanceCenterComponent } from './app/pages/finance/finance-center.component';
 import { MarketingCenterComponent } from './app/pages/marketing/marketing-center.component';
+import { DebugAuthPageComponent } from './app/pages/debug-auth/debug-auth.component';
 
 const routes: Routes = [
   { path: '', component: HomePageComponent },
@@ -59,13 +63,15 @@ const routes: Routes = [
   { path: 'transport', component: TransportListPageComponent },
   { path: 'track', component: PublicTrackingPageComponent },
   { path: 'store/:slug', component: StoreLandingPageComponent },
+  { path: 'debug-auth', component: DebugAuthPageComponent },
   { path: '**', redirectTo: '' }
 ];
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(withInterceptors([devUserInterceptor, authTokenInterceptor, errorsInterceptor])),
-    provideRouter(routes)
+    provideRouter(routes),
+    { provide: APP_INITIALIZER, multi: true, useFactory: authInitFactory, deps: [CoreAuthService] }
   ]
 }).catch(err => console.error(err));
 

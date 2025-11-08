@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom, tap } from 'rxjs';
+import { environment } from '../environments/environment';
 
-// Call Core API directly via hostname (prod-like topology)
-const apiBase = 'https://api.berjis.tech';
+// Core API base; allows window overrides via environments
+const apiBase = environment.apiBase;
 
 export interface Me { id: string; email?: string; name?: string }
 
@@ -19,12 +20,13 @@ export class ApiService {
     } catch {}
     return h;
   }
+  // Do NOT send Authorization to Core verify/refresh. Cookies are the source of truth.
   verify() {
-    return this.http.get<any>(`${apiBase}/v1/auth/verify`, { withCredentials: true, headers: this.authHeaders() })
+    return this.http.post<any>(`${apiBase}/v1/auth/verify`, {}, { withCredentials: true })
       .pipe(tap(res => this.syncUser(res?.data)));
   }
   refresh() {
-    return this.http.post<any>(`${apiBase}/v1/auth/refresh`, {}, { withCredentials: true, headers: this.authHeaders() })
+    return this.http.post<any>(`${apiBase}/v1/auth/refresh`, {}, { withCredentials: true })
       .pipe(tap((res: any) => {
         try {
           const token = res?.data?.access || res?.access;

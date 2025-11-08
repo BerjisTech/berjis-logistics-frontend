@@ -15,8 +15,11 @@
           Build resilient supply chains, unlock new revenue, and give customers real-time visibility end-to-end.
         </p>
         <div class="mt-8 flex flex-wrap items-center gap-4">
-          <a routerLink="/dashboard" class="inline-flex items-center rounded-full bg-yellow-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-yellow-400/30 transition hover:-translate-y-0.5 hover:bg-yellow-300">
+          <a *ngIf="isAuthed()" routerLink="/dashboard" class="inline-flex items-center rounded-full bg-yellow-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-yellow-400/30 transition hover:-translate-y-0.5 hover:bg-yellow-300">
             Launch Control Tower
+          </a>
+          <a *ngIf="!isAuthed()" [href]="loginUrl()" class="inline-flex items-center rounded-full bg-yellow-400 px-6 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-yellow-400/30 transition hover:-translate-y-0.5 hover:bg-yellow-300">
+            Get Started
           </a>
           <a routerLink="/storage" class="inline-flex items-center rounded-full border border-white/30 px-6 py-3 text-base font-semibold text-white transition hover:border-yellow-400 hover:text-yellow-300">
             Explore Network
@@ -136,8 +139,11 @@
         Get started with a network walkthrough, connect your inventory, or invite your first partners. We’ll guide you through each step.
       </p>
       <div class="flex flex-wrap items-center justify-center gap-4">
-        <a routerLink="/dashboard" class="inline-flex items-center rounded-full bg-blue-900 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-blue-900/30 transition hover:-translate-y-0.5 hover:bg-blue-800">
+        <a *ngIf="isAuthed()" routerLink="/dashboard" class="inline-flex items-center rounded-full bg-blue-900 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-blue-900/30 transition hover:-translate-y-0.5 hover:bg-blue-800">
           Launch Dashboard
+        </a>
+        <a *ngIf="!isAuthed()" [href]="loginUrl()" class="inline-flex items-center rounded-full bg-blue-900 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-blue-900/30 transition hover:-translate-y-0.5 hover:bg-blue-800">
+          Get Started
         </a>
         <a routerLink="/track" class="inline-flex items-center rounded-full border border-slate-900 px-6 py-3 text-base font-semibold text-slate-900 transition hover:border-yellow-400 hover:text-yellow-500">
           Share Tracking Demo

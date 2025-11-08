@@ -7,6 +7,11 @@
 
   <header></header>
   <router-outlet></router-outlet>
-  <footer></footer>
+  <footer class="mt-auto border-t border-white/10 bg-white/50 p-4 text-center text-xs text-slate-600 backdrop-blur dark:bg-slate-900/60 dark:text-slate-300">
+    <div>
+      Berjis Logistics • Build: {{ environment.buildTag || 'dev' }}
+      • <a routerLink="/debug-auth" class="underline hover:text-blue-700 dark:hover:text-yellow-400">Debug Auth</a>
+    </div>
+  </footer>
   <app-dev-toolbar></app-dev-toolbar>
 </div>
