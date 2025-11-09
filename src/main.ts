@@ -6,6 +6,7 @@ import { errorsInterceptor } from './app/errors.interceptor';
 import { authTokenInterceptor } from './app/auth-token.interceptor';
 import { provideRouter, Routes } from '@angular/router';
 import { APP_INITIALIZER } from '@angular/core';
+import { CORE_AUTH_API_BASE } from '@berjis/angular-auth';
 import { CoreAuthService } from './app/core/auth.service';
 import { authInitFactory } from './app/auth.init';
 import { HomePageComponent } from './app/pages/home/home.component';
@@ -27,6 +28,7 @@ import { DashboardProductsComponent } from './app/pages/dashboard/dashboard-prod
 import { DashboardCrmComponent } from './app/pages/dashboard/dashboard-crm.component';
 import { DashboardDriverComponent } from './app/pages/dashboard/dashboard-driver.component';
 import { PublicTrackingPageComponent } from './app/pages/public-tracking/public-tracking.component';
+import { environment } from './environments/environment';
 
 import { DashboardStoresComponent } from './app/pages/dashboard/dashboard-stores.component';
 import { StoreManagePageComponent } from './app/pages/dashboard/store-manage.component';
@@ -71,6 +73,7 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(withInterceptors([devUserInterceptor, authTokenInterceptor, errorsInterceptor])),
     provideRouter(routes),
+    { provide: CORE_AUTH_API_BASE, useValue: environment.apiBase },
     { provide: APP_INITIALIZER, multi: true, useFactory: authInitFactory, deps: [CoreAuthService] }
   ]
 }).catch(err => console.error(err));
